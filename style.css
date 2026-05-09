@@ -1,0 +1,52 @@
+:root {
+    --bg: #000; --green: #00ff00; --white: #fff; --yellow: #ffff00;
+    --ltd: #e60012; --exp: #f39800; --semi: #009944; --local: #eee;
+}
+body { background: var(--bg); color: var(--white); font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif; margin: 0; overflow: hidden; touch-action: manipulation; }
+.monitor { height: 100vh; display: flex; flex-direction: column; padding: 10px; box-sizing: border-box; }
+
+.top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 5px; }
+.type-badge { font-size: 1.2rem; padding: 4px 15px; font-weight: bold; border-radius: 4px; text-align: center; }
+.t-local { background: var(--local); color: #000; }
+.t-ltd { background: var(--ltd); color: #fff; }
+.t-exp, .t-rexp, .t-sexp { background: var(--exp); color: #fff; }
+.t-semi { background: var(--semi); color: #fff; }
+.clock { font-size: 1.5rem; font-family: monospace; font-weight: bold; }
+
+.main-info { flex-grow: 0; text-align: center; padding: 10px 0; }
+.bound-label { font-size: 1.2rem; color: #aaa; }
+.station-name { font-size: 5rem; font-weight: bold; color: var(--green); line-height: 1.1; }
+.station-english { font-size: 1.8rem; color: #777; text-transform: uppercase; }
+
+.route-bar { display: flex; background: #111; height: 15px; margin: 10px 0; border-radius: 10px; border: 1px solid #444; }
+.route-dot { flex: 1; border-right: 1px solid #222; }
+.route-dot.stop { background: #003366; }
+.route-dot.active { background: var(--green); box-shadow: 0 0 10px var(--green); }
+
+/* 停車駅リスト */
+.station-list-container {
+    flex-grow: 1;
+    background: #0a0a0a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 8px;
+    overflow-y: auto;
+}
+.list-label { font-size: 0.7rem; color: var(--green); margin-bottom: 5px; border-bottom: 1px solid #222; }
+.stop-item { display: flex; justify-content: space-between; padding: 6px 10px; margin-bottom: 3px; background: #151515; border-radius: 4px; border-left: 4px solid #333; font-size: 0.9rem; }
+.stop-item.current { background: var(--green); color: #000; font-weight: bold; border-left-color: #fff; }
+.stop-item.passed { opacity: 0.3; }
+
+.door-indicator { font-size: 1.2rem; font-weight: bold; text-align: center; padding: 8px; border: 2px solid #333; margin-bottom: 10px; border-radius: 5px; }
+.door-indicator.open { color: var(--yellow); border-color: var(--yellow); animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: 0.3; } }
+
+.control-panel { background: #111; padding: 8px; border-radius: 8px; }
+.inline-select { display: flex; gap: 5px; margin-bottom: 8px; }
+select { flex: 1; background: #222; color: #fff; border: 1px solid #444; padding: 8px; font-size: 0.8rem; border-radius: 4px; }
+.button-group { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+button { background: #222; color: #fff; border: 1px solid #444; padding: 10px 2px; font-size: 0.75rem; border-radius: 4px; font-weight: bold; }
+.green-btn { color: #00ff00; } .blue-btn { color: #44aaff; } .yellow-btn { color: #ffff00; } .red-btn { color: #ff5555; }
+.auto-btn.active { background: var(--green); color: #000; }
+.note-area { color: var(--yellow); font-size: 0.9rem; text-align: center; margin-top: 5px; min-height: 1.2em; }

@@ -1,0 +1,21 @@
+const stations = [
+    { name: "館浜", yomi: "タテハマ", en: "Tatehama", local:true, semi:true, s_exp:true, exp:true, r_exp:true, ltd:true, transfer: "自営アール線" },
+    { name: "駒野", yomi: "コマノ", en: "Komano", local:true, semi:true, s_exp:true, exp:true, r_exp:true, ltd:false, transfer: "" },
+    { name: "河原崎", yomi: "カワラサキ", en: "Kawarasaki", local:true, semi:false, s_exp:false, exp:false, r_exp:false, ltd:false, transfer: "" },
+    { name: "海岸公園", yomi: "カイガンコーエン", en: "Kaigan-Koen", local:true, semi:false, s_exp:false, exp:false, r_exp:false, ltd:false, transfer: "" },
+    { name: "虹ヶ浜", yomi: "ニジガハマ", en: "Nijigahama", local:true, semi:false, s_exp:false, exp:false, r_exp:false, ltd:false, transfer: "" },
+    { name: "津崎", yomi: "ツサキ", en: "Tsusaki", local:true, semi:false, s_exp:false, exp:false, r_exp:false, ltd:false, transfer: "" },
+    { name: "浜園", yomi: "ハマゾノ", en: "Hamazono", local:true, semi:true, s_exp:false, exp:false, r_exp:false, ltd:false, transfer: "自営アール線" },
+    { name: "羽衣橋", yomi: "ハゴロモバシ", en: "Hagoromobashi", local:true, semi:false, s_exp:false, exp:false, r_exp:false, ltd:false, transfer: "" },
+    { name: "新井川", yomi: "ニイガワ", en: "Niigawa", local:true, semi:false, s_exp:false, exp:false, r_exp:false, ltd:false, transfer: "" },
+    { name: "新野崎", yomi: "シンノザキ", en: "Shin-Nozaki", local:true, semi:true, s_exp:true, exp:true, r_exp:true, ltd:false, transfer: "" },
+    { name: "江ノ原", yomi: "エノハラ", en: "Enohara", local:true, semi:true, s_exp:true, exp:true, r_exp:false, ltd:false, transfer: "" },
+    { name: "大道寺", yomi: "ダイドージ", en: "Daidoji", local:true, semi:true, s_exp:true, exp:true, r_exp:true, ltd:true, transfer: "モノレール" },
+    { name: "藤江", yomi: "フジエ", en: "Fujie", local:true, semi:true, s_exp:true, exp:true, r_exp:true, ltd:false, transfer: "" },
+    { name: "水越", yomi: "ミズコシ", en: "Mizukoshi", local:true, semi:true, s_exp:true, exp:true, r_exp:true, ltd:false, transfer: "" },
+    { name: "高見沢", yomi: "タカミザワ", en: "Takamizawa", local:true, semi:true, s_exp:true, exp:true, r_exp:false, ltd:false, transfer: "" },
+    { name: "日野森", yomi: "ヒノモリ", en: "Hinomori", local:true, semi:true, s_exp:true, exp:true, r_exp:true, ltd:false, transfer: "" },
+    { name: "奥峯口", yomi: "オクミネグチ", en: "Okumineguchi", local:true, semi:true, s_exp:true, exp:true, r_exp:false, ltd:false, transfer: "" },
+    { name: "西赤山", yomi: "ニシアカヤマ", en: "Nishi-Akayama", local:true, semi:true, s_exp:true, exp:true, r_exp:false, ltd:false, transfer: "" },
+    { name: "赤山町", yomi: "アカヤマチョー", en: "Akayamacho", local:true, semi:true, s_exp:true, exp:true, r_exp:true, ltd:true, transfer: "" }
+];

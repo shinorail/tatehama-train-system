@@ -1,0 +1,9 @@
+{
+  "name": "館浜電鉄 運転補助システム",
+  "short_name": "館浜補助",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#00ff00",
+  "icons": [{ "src": "https://via.placeholder.com/192", "sizes": "192x192", "type": "image/png" }]
+}
