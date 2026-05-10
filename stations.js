@@ -10,7 +10,7 @@ const stations = [
     { name: "新井川", yomi: "ニイガワ", en: "Niigawa", local:true, semi:false, s_exp:false, exp:false, r_exp:false, ltd:false, transfer: "" },
     { name: "新野崎", yomi: "シンノザキ", en: "Shin-Nozaki", local:true, semi:true, s_exp:true, exp:true, r_exp:true, ltd:false, transfer: "" },
     { name: "江ノ原", yomi: "エノハラ", en: "Enohara", local:true, semi:true, s_exp:true, exp:true, r_exp:false, ltd:false, transfer: "" },
-    { name: "大道寺", yomi: "ダイドージ", en: "Daidoji", local:true, semi:true, s_exp:true, exp:true, r_exp:true, ltd:true, transfer: "モノレール" },
+    { name: "大道寺", yomi: "ダイドージ", en: "Daidoji", local:true, semi:true, s_exp:true, exp:true, r_exp:true, ltd:true, transfer: "" },
     { name: "藤江", yomi: "フジエ", en: "Fujie", local:true, semi:true, s_exp:true, exp:true, r_exp:true, ltd:false, transfer: "" },
     { name: "水越", yomi: "ミズコシ", en: "Mizukoshi", local:true, semi:true, s_exp:true, exp:true, r_exp:true, ltd:false, transfer: "" },
     { name: "高見沢", yomi: "タカミザワ", en: "Takamizawa", local:true, semi:true, s_exp:true, exp:true, r_exp:false, ltd:false, transfer: "" },
