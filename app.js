@@ -104,7 +104,7 @@ function playAnn(mode) {
             break;
         case 'door': speak("ドアが閉まります。ご注意ください。"); break;
         case 'chime': UI.chime.play(); break;
-        case 'wait': speak("この駅で、後の特急電車の待ち合わせをいたします。発車までしばらくお待ちください。"); break;
+        case 'wait': speak("この駅で、電車の待ち合わせをいたします。発車までしばらくお待ちください。"); break;
         case 'manner': speak("車内では、携帯電話をマナーモードに設定のうえ、通話はご遠慮ください。ご協力をお願いします。"); break;
         case 'delay': speak("列車が遅れまして、ご迷惑をおかけしております。"); break;
     }
