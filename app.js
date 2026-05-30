@@ -1,4 +1,4 @@
-const UI = {
+const UI = {　
     lcdName: document.getElementById('lcdName'),
     lcdEn: document.getElementById('lcdEn'),
     typeBadge: document.getElementById('typeBadge'),
