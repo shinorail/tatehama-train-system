@@ -6,7 +6,7 @@ const UI = {
     routeMap: document.getElementById('routeMap'),
     telop: document.getElementById('telopTxt'),
     curStSel: document.getElementById('curStSel'),
-    typeSel: document.getElementById('typeSel'),
+    typeSel: document.getElementById('typeSel'),　
     dirSel: document.getElementById('dirSel'),
     mel: document.getElementById('melAudio'),
     chime: document.getElementById('chimeAudio'),
