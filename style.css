@@ -8,7 +8,7 @@
 
 body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; }
 
-/* 起動画面 */
+/* 起動画面 */　
 #boot { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 10px solid #333; }
 
 /* LCD表示エリア */
