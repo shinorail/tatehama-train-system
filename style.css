@@ -1,55 +1,146 @@
 :root {
-    --bg: #000;
-    --lcd-bg: #fff;
-    --blue: #0044cc;
-    --panel: #1a1a1a;
-    --green: #00ff00;
+    --bg-dark: #121212;
+    --panel-bg: #1e1e1e;
+    --lcd-bg: #ffffff;
+    --accent-blue: #0056b3;
+    --accent-green: #28a745;
+    --accent-red: #d9534f;
+    --text-main: #e0e0e0;
 }
-　
-body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; }
 
-/* 起動画面 */　
-#boot { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 10px solid #333; }
+body {
+    background: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', sans-serif;
+    margin: 0;
+    overflow: hidden;
+}
 
-/* LCD表示エリア */
-.lcd { height: 42vh; background: var(--lcd-bg); color: #000; margin: 5px; border-radius: 8px; border: 4px solid #444; position: relative; display: flex; flex-direction: column; overflow: hidden; }
-.lcd-header { background: var(--blue); color: #fff; padding: 8px 20px; display: flex; justify-content: space-between; align-items: center; }
-.type-badge { padding: 4px 15px; border-radius: 4px; font-weight: bold; font-size: 1.4rem; border: 2px solid #fff; }
-.lcd-main { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-.next-label { color: var(--blue); font-weight: bold; font-size: 1.2rem; }
-.st-name { font-size: 5rem; font-weight: bold; margin: -10px 0; }
-.st-en { font-size: 2rem; color: #666; text-transform: uppercase; }
+/* --- 起動画面 (Boot Screen) --- */
+#boot {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
 
-/* 路線図 */
-.route-map { height: 40px; background: #eee; display: flex; align-items: center; padding: 0 15px; gap: 5px; }
-.dot { flex: 1; height: 10px; background: #ccc; border-radius: 5px; transition: 0.3s; }
-.dot.stop { background: var(--blue); }
-.dot.active { background: #f00; transform: scaleY(1.8); box-shadow: 0 0 10px #f00; }
+.boot-content { width: 300px; }
+.boot-logo { color: #fff; font-size: 2.5rem; letter-spacing: 4px; margin: 0; font-weight: 200; }
+.boot-logo span { color: var(--accent-blue); font-weight: bold; }
+.line { height: 2px; background: var(--accent-blue); margin: 15px 0; width: 0; animation: lineGrow 1.5s forwards; }
+@keyframes lineGrow { to { width: 100%; } }
 
-/* テロップ */
-.telop { background: #000; color: #fff; height: 35px; line-height: 35px; overflow: hidden; position: relative; font-size: 1.3rem; }
-.telop-txt { position: absolute; white-space: nowrap; animation: scroll 15s linear infinite; padding-left: 100%; }
-@keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+#bootBtn {
+    background: transparent;
+    border: 1px solid #555;
+    color: #888;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+#bootBtn:hover { color: #fff; border-color: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
 
-/* 操作パネル */
-.panel { height: 58vh; background: var(--panel); padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-.row { display: flex; gap: 5px; }
-select { flex: 1; background: #333; color: #fff; border: 1px solid #555; padding: 10px; border-radius: 5px; }
-.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; flex-grow: 1; }
-button { background: #444; color: #fff; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.8rem; }
-button:active { filter: brightness(1.5); transform: translateY(2px); }
+/* --- LCD表示部 --- */
+.lcd {
+    height: 45vh;
+    background: var(--lcd-bg);
+    margin: 10px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
 
-/* ボタンカラー */
-.btn-green { background: #005500; color: #0f0; }
-.btn-blue { background: #003366; color: #8cf; }
-.btn-red { background: #800; color: #f88; }
-.btn-orange { background: #850; color: #fc0; }
-.btn-black { background: #000; color: #fff; border: 1px solid #444; }
-.btn-yellow { background: #660; color: #ff0; }
+.lcd-header {
+    background: var(--accent-blue);
+    color: #fff;
+    padding: 12px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-.active { background: #00ff00 !important; color: #000 !important; }
-.night-mode { filter: brightness(0.5) contrast(1.2) sepia(0.2); }
+.type-badge {
+    padding: 2px 20px;
+    border: 2px solid #fff;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
 
-/* 緊急事態 */
-#emergencyMsg { position: absolute; inset: 0; background: #a00; color: #fff; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; animation: flash 0.5s infinite; }
-@keyframes flash { 0%, 100% { background: #a00; } 50% { background: #500; } }
+.lcd-main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+}
+
+.next-label-container { display: flex; align-items: baseline; gap: 8px; color: var(--accent-blue); }
+.next-label-jp { font-size: 1.5rem; font-weight: bold; }
+.next-label-en { font-size: 1.2rem; }
+
+.st-name { font-size: 6.5rem; font-weight: bold; margin: 5px 0; letter-spacing: -2px; }
+.st-en { font-size: 2.2rem; color: #888; text-transform: uppercase; letter-spacing: 2px; }
+
+.route-container { padding: 0 20px; background: #f8f9fa; }
+.route-map { height: 12px; background: #ddd; border-radius: 6px; display: flex; gap: 4px; }
+.dot { flex: 1; border-radius: 6px; background: #ccc; transition: 0.5s; }
+.dot.stop { background: var(--accent-blue); }
+.dot.active { background: #ff4757; transform: scaleY(1.8); box-shadow: 0 0 10px rgba(255,71,87,0.5); }
+
+.telop { background: #000; color: #fff; height: 40px; font-size: 1.4rem; line-height: 40px; }
+
+/* --- 操作パネル --- */
+.panel {
+    height: 55vh;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.control-row { display: flex; gap: 10px; }
+select {
+    background: #2a2a2a;
+    color: #fff;
+    border: 1px solid #444;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+.btn-group { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+
+button {
+    border: none;
+    padding: 15px 5px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 0.9rem;
+    background: #333;
+    color: #eee;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+button:active { transform: translateY(2px); box-shadow: none; }
+
+.btn-main { background: var(--accent-green); color: #fff; }
+.btn-blue { background: #2c3e50; color: #3498db; }
+.btn-pink { background: #631d3a; color: #ff79c6; }
+.btn-orange { background: #643d12; color: #ffb86c; }
+.btn-red { background: #821717; color: #ff5555; grid-column: span 4; font-size: 1.2rem; }
+.btn-black { background: #000; }
