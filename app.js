@@ -3,7 +3,7 @@ const UI = {　
     lcdEn: document.getElementById('lcdEn'),
     typeBadge: document.getElementById('typeBadge'),
     destDisp: document.getElementById('destDisp'),
-    routeMap: document.getElementById('routeMap'),
+    routeMap: document.getElementById('routeMap'),　
     telop: document.getElementById('telopTxt'),
     curStSel: document.getElementById('curStSel'),
     typeSel: document.getElementById('typeSel'),
