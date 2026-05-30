@@ -1,22 +1,28 @@
+/* --- 変数定義：すべてのカラーを一括管理 --- */
 :root {
-    --bg-dark: #121212;
-    --panel-bg: #1e1e1e;
-    --lcd-bg: #ffffff;
-    --accent-blue: #0056b3;
-    --accent-green: #28a745;
-    --accent-red: #d9534f;
-    --text-main: #e0e0e0;
+    --bg-dark: #0d0d0d;        /* 全体背景 */
+    --panel-bg: #1a1a1a;       /* 操作パネル背景 */
+    --lcd-bg: #ffffff;         /* LCD通常背景 */
+    --accent-blue: #0056b3;    /* 館浜ブルー */
+    --accent-green: #008f39;   /* 正常・進行カラー */
+    --accent-red: #d90000;     /* 非常・警告カラー */
+    --accent-pink: #d63384;    /* 修学旅行・団体カラー */
+    --accent-orange: #f39800;  /* 遅延・注意カラー */
+    --text-white: #e0e0e0;     /* パネル文字色 */
+    --text-black: #1a1a1a;     /* LCD文字色 */
 }
 
+/* --- ベース設定 --- */
 body {
     background: var(--bg-dark);
-    color: var(--text-main);
-    font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', sans-serif;
+    color: var(--text-white);
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
     margin: 0;
     overflow: hidden;
+    touch-action: manipulation; /* スマホ誤操作防止 */
 }
 
-/* --- 起動画面 (Boot Screen) --- */
+/* --- 起動画面 (Boot Screen)：画像のデザインを再現 --- */
 #boot {
     position: fixed;
     inset: 0;
@@ -28,49 +34,64 @@ body {
     text-align: center;
 }
 
-.boot-content { width: 300px; }
-.boot-logo { color: #fff; font-size: 2.5rem; letter-spacing: 4px; margin: 0; font-weight: 200; }
-.boot-logo span { color: var(--accent-blue); font-weight: bold; }
-.line { height: 2px; background: var(--accent-blue); margin: 15px 0; width: 0; animation: lineGrow 1.5s forwards; }
-@keyframes lineGrow { to { width: 100%; } }
-
-#bootBtn {
-    background: transparent;
-    border: 1px solid #555;
-    color: #888;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: 0.3s;
+.boot-content { width: 320px; }
+.boot-logo { 
+    color: #00ff00; 
+    font-size: 3.5rem; 
+    font-weight: 800; 
+    margin: 0; 
+    letter-spacing: 2px;
 }
-#bootBtn:hover { color: #fff; border-color: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
+.status-text {
+    color: #fff;
+    font-size: 1.2rem;
+    margin: 20px 0;
+}
+#bootBtn {
+    background: var(--accent-blue);
+    border: none;
+    color: #fff;
+    padding: 15px 30px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
 
-/* --- LCD表示部 --- */
+/* --- 車内表示器 (LCD)：実車風のクオリティ --- */
 .lcd {
-    height: 45vh;
+    height: 42vh;
     background: var(--lcd-bg);
-    margin: 10px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    margin: 8px;
+    border-radius: 10px;
+    border: 4px solid #333;
+    position: relative;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
 }
 
 .lcd-header {
     background: var(--accent-blue);
     color: #fff;
-    padding: 12px 25px;
+    padding: 10px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .type-badge {
-    padding: 2px 20px;
-    border: 2px solid #fff;
-    font-weight: bold;
-    font-size: 1.5rem;
+    padding: 4px 18px;
+    border: 3px solid #fff;
+    border-radius: 4px;
+    font-weight: 900;
+    font-size: 1.8rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
+
+.dest-info { font-size: 2rem; font-weight: bold; }
+.clock { font-family: 'Courier New', Courier, monospace; font-size: 1.4rem; font-weight: bold; }
 
 .lcd-main {
     flex-grow: 1;
@@ -78,69 +99,120 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    color: #333;
+    color: var(--text-black);
 }
 
-.next-label-container { display: flex; align-items: baseline; gap: 8px; color: var(--accent-blue); }
-.next-label-jp { font-size: 1.5rem; font-weight: bold; }
-.next-label-en { font-size: 1.2rem; }
+.next-label-container { color: var(--accent-blue); font-weight: bold; margin-bottom: -10px; }
+.next-label-jp { font-size: 1.5rem; }
+.next-label-en { font-size: 1.2rem; margin-left: 10px; }
 
-.st-name { font-size: 6.5rem; font-weight: bold; margin: 5px 0; letter-spacing: -2px; }
-.st-en { font-size: 2.2rem; color: #888; text-transform: uppercase; letter-spacing: 2px; }
+.st-name { font-size: 6.5rem; font-weight: 900; margin: 0; letter-spacing: -2px; }
+.st-en { font-size: 2.2rem; color: #666; font-weight: bold; text-transform: uppercase; }
 
-.route-container { padding: 0 20px; background: #f8f9fa; }
-.route-map { height: 12px; background: #ddd; border-radius: 6px; display: flex; gap: 4px; }
-.dot { flex: 1; border-radius: 6px; background: #ccc; transition: 0.5s; }
+/* 路線図ドット表示 */
+.route-container { padding: 5px 15px; background: #eee; }
+.route-map { height: 15px; display: flex; gap: 4px; align-items: center; }
+.dot { flex: 1; height: 100%; background: #ccc; border-radius: 3px; transition: 0.4s ease; }
 .dot.stop { background: var(--accent-blue); }
-.dot.active { background: #ff4757; transform: scaleY(1.8); box-shadow: 0 0 10px rgba(255,71,87,0.5); }
+.dot.active { 
+    background: #ff0000; 
+    transform: scaleY(1.8); 
+    box-shadow: 0 0 10px #ff0000; 
+}
 
-.telop { background: #000; color: #fff; height: 40px; font-size: 1.4rem; line-height: 40px; }
+/* テロップスクロール */
+.telop { background: #000; color: #fff; height: 35px; line-height: 35px; font-size: 1.3rem; position: relative; }
+.telop-txt { 
+    position: absolute; 
+    white-space: nowrap; 
+    animation: scroll 15s linear infinite; 
+    padding-left: 100%; 
+}
+@keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-100%); } }
 
-/* --- 操作パネル --- */
+/* --- 操作パネル (Panel) --- */
 .panel {
-    height: 55vh;
-    padding: 15px;
+    height: 58vh;
+    padding: 10px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
+    background: var(--panel-bg);
 }
 
-.control-row { display: flex; gap: 10px; }
+.control-row { display: flex; gap: 6px; }
 select {
-    background: #2a2a2a;
+    flex: 1;
+    background: #333;
     color: #fff;
     border: 1px solid #444;
     padding: 12px;
-    border-radius: 6px;
-    font-size: 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
 }
 
-.grid-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-}
-
-.btn-group { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.grid-container { display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
+.btn-group { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
 
 button {
-    border: none;
+    background: #444;
+    color: #fff;
+    border: 1px solid #555;
     padding: 15px 5px;
-    border-radius: 6px;
+    border-radius: 4px;
     font-weight: bold;
+    font-size: 0.8rem;
     cursor: pointer;
-    transition: 0.2s;
-    font-size: 0.9rem;
-    background: #333;
-    color: #eee;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+    transition: background 0.2s;
 }
 
-button:active { transform: translateY(2px); box-shadow: none; }
+button:active { background: #666; transform: translateY(2px); }
 
-.btn-main { background: var(--accent-green); color: #fff; }
-.btn-blue { background: #2c3e50; color: #3498db; }
-.btn-pink { background: #631d3a; color: #ff79c6; }
-.btn-orange { background: #643d12; color: #ffb86c; }
-.btn-red { background: #821717; color: #ff5555; grid-column: span 4; font-size: 1.2rem; }
-.btn-black { background: #000; }
+/* ボタンカラーバリエーション */
+.btn-main { background: #005a00; color: #00ff00; border-color: #007a00; }
+.btn-blue { background: #003366; color: #8cf; border-color: #004488; }
+.btn-pink { background: #631d3a; color: #ff79c6; border-color: #832d4a; }
+.btn-orange { background: #643d12; color: #ffb86c; border-color: #844d22; }
+.btn-dark { background: #222; color: #ff0; }
+.btn-black { background: #000; color: #fff; }
+.btn-red { 
+    background: #800000; 
+    color: #fff; 
+    grid-column: span 4; 
+    font-size: 1.2rem; 
+    border-color: #a00000; 
+}
+
+/* 状態クラス */
+.active { background: #00ff00 !important; color: #000 !important; }
+.night-mode { filter: brightness(0.4) contrast(1.2); }
+
+/* --- 緊急停止 (Emergency Overlay) --- */
+#emergencyMsg {
+    position: absolute;
+    inset: 0;
+    background: rgba(200, 0, 0, 0.9);
+    z-index: 1000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    animation: flash 0.5s infinite;
+}
+
+.emer-box {
+    text-align: center;
+    color: #fff;
+    border: 10px solid #fff;
+    padding: 40px;
+}
+
+.emer-box h1 { font-size: 4rem; margin: 0; }
+.emer-box p { font-size: 1.5rem; font-weight: bold; }
+
+@keyframes flash {
+    0%, 100% { background: rgba(180, 0, 0, 0.9); }
+    50% { background: rgba(80, 0, 0, 0.9); }
+}
+
+/* スクロールバーの非表示（パネルがはみ出た場合用） */
+.panel::-webkit-scrollbar { display: none; }
