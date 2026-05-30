@@ -1,9 +1,9 @@
-const UI = {　
+const UI = {
     lcdName: document.getElementById('lcdName'),
     lcdEn: document.getElementById('lcdEn'),
     typeBadge: document.getElementById('typeBadge'),
     destDisp: document.getElementById('destDisp'),
-    routeMap: document.getElementById('routeMap'),　
+    routeMap: document.getElementById('routeMap'),
     telop: document.getElementById('telopTxt'),
     curStSel: document.getElementById('curStSel'),
     typeSel: document.getElementById('typeSel'),
@@ -12,6 +12,7 @@ const UI = {　
     chime: document.getElementById('chimeAudio'),
     sideBtn: document.getElementById('sideBtn'),
     boot: document.getElementById('boot'),
+    bootBtn: document.getElementById('bootBtn'), // 追加
     emer: document.getElementById('emergencyMsg'),
     alertTxt: document.getElementById('alertTxt'),
     clock: document.getElementById('clock')
@@ -32,6 +33,7 @@ const meta = {
 let doorSide = "左";
 let voices = [];
 
+// 音声読み込み
 function loadVoices() {
     voices = window.speechSynthesis.getVoices();
 }
@@ -39,9 +41,14 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = loadVoices;
 }
 
-UI.boot.onclick = () => {
-    UI.boot.style.display = 'none';
-    speak("システムを同期しました。運行管理を開始します。");
+// 起動ボタン：デザインに合わせたフェードアウト処理
+UI.bootBtn.onclick = () => {
+    UI.boot.style.opacity = '0';
+    UI.boot.style.transition = 'opacity 0.8s ease';
+    setTimeout(() => {
+        UI.boot.style.display = 'none';
+        speak("システムオンライン。運行管理を開始します。");
+    }, 800);
 };
 
 function speak(ja, en = "") {
@@ -65,15 +72,11 @@ function update() {
     const type = UI.typeSel.value;
     const curIdx = parseInt(UI.curStSel.value);
 
-    // バッジ更新
     UI.typeBadge.textContent = meta[type].n;
     UI.typeBadge.style.backgroundColor = meta[type].c;
     UI.typeBadge.style.color = meta[type].tc || "#fff";
-    
-    // 行先更新
     UI.destDisp.textContent = route[route.length - 1].name;
 
-    // 次駅判定（修学旅行・試運転は全駅停車として計算）
     const next = route.slice(curIdx + 1).find(s => (type === 'school' || type === 'trial' || type === 'extra' ? true : s[type]));
     
     if(next) {
@@ -86,7 +89,6 @@ function update() {
         UI.lcdName.textContent = "終点"; UI.lcdEn.textContent = "TERMINAL";
     }
 
-    // 路線図更新
     UI.routeMap.innerHTML = '';
     route.forEach((st, i) => {
         const d = document.createElement('div');
@@ -116,25 +118,22 @@ function playAnn(mode) {
                   `We will soon make a brief stop at ${next.en}. The doors on the ${doorSide === '左'?'left':'right'} side will open.`);
             break;
         case 'school_greet':
-            speak("本日は修学旅行でのご利用、誠にありがとうございます。思い出に残る楽しい旅となりますよう、乗務員一同お手伝いさせていただきます。", 
-                  "Welcome on board our School Trip special train.");
-            break;
-        case 'school_dest':
-            speak(`この電車は、団体専用、修学旅行列車、${route[route.length-1].yomi}ゆきです。一般のお客様はご乗車になれません。`);
+            speak("本日は修学旅行でのご利用、誠にありがとうございます。思い出に残る楽しい旅となりますよう、乗務員一同お手伝いさせていただきます。");
+            setTelop("【修学旅行】本日は館浜電鉄をご利用いただきありがとうございます。");
             break;
         case 'accident':
-            speak("現在、前を走る電車に急病人が発生したため、一時停車しております。運転再開までしばらくお待ちください。");
+            speak("現在、前を走る電車に急病人が発生したため、一時停車しております。");
             setTelop("【運行情報】急病人対応のため、一時停車中。");
             break;
         case 'earthquake':
-            speak("ただいま強い地震が発生しました。急停車します、ご注意ください！");
+            speak("ただいま強い地震が発生しました。急停車します！");
             emergency();
             break;
         case 'delay': speak("列車が遅れまして、ご迷惑をおかけしております。"); break;
         case 'door': speak("ドアが閉まります。ご注意ください。"); break;
         case 'chime': UI.chime.play(); break;
-        case 'manner': speak("車内では、携帯電話をマナーモードに設定のうえ、通話はご遠慮ください。"); break;
-        case 'wait': speak("この駅で、電車の待ち合わせをいたします。"); break;
+        case 'manner': speak("車内では携帯電話をマナーモードに設定のうえ、通話はご遠慮ください。"); break;
+        case 'wait': speak("この駅で電車の待ち合わせをいたします。"); break;
     }
 }
 
@@ -144,8 +143,14 @@ function toggleSide() {
 }
 
 function toggleMelody() {
-    if(UI.mel.paused) { UI.mel.play(); document.getElementById('melBtn').classList.add('active'); }
-    else { UI.mel.pause(); UI.mel.currentTime = 0; document.getElementById('melBtn').classList.remove('active'); }
+    if(UI.mel.paused) { 
+        UI.mel.play(); 
+        document.getElementById('melBtn').classList.add('active'); 
+    } else { 
+        UI.mel.pause(); 
+        UI.mel.currentTime = 0; 
+        document.getElementById('melBtn').classList.remove('active'); 
+    }
 }
 
 function toggleNight() { document.body.classList.toggle('night-mode'); }
@@ -166,6 +171,7 @@ UI.dirSel.onchange = () => {
     });
     update();
 };
+
 UI.typeSel.onchange = update;
 UI.curStSel.onchange = update;
 setInterval(() => { UI.clock.textContent = new Date().toLocaleTimeString(); }, 1000);
