@@ -13,31 +13,35 @@ const UI = {
     sideBtn: document.getElementById('sideBtn'),
     boot: document.getElementById('boot'),
     emer: document.getElementById('emergencyMsg'),
-    alertTxt: document.getElementById('alertTxt')
+    alertTxt: document.getElementById('alertTxt'),
+    clock: document.getElementById('clock')
 };
 
 const meta = {
-    local: {n: "普通", c: "#666"}, semi: {n: "準急", c: "#009944"},
-    s_exp: {n: "区急", c: "#ffcc00"}, exp: {n: "急行", c: "#f39800"},
-    r_exp: {n: "快急", c: "#ff5500"}, ltd: {n: "特急", c: "#e60012"}
+    local: {n: "普通", c: "#666"},
+    semi: {n: "準急", c: "#009944"},
+    s_exp: {n: "区急", c: "#ffcc00"},
+    exp: {n: "急行", c: "#f39800"},
+    r_exp: {n: "快急", c: "#ff5500"},
+    ltd: {n: "特急", c: "#e60012"},
+    school: {n: "修学旅行", c: "#d63384"},
+    extra: {n: "臨時", c: "#0055ff"},
+    trial: {n: "試運転", c: "#ffffff", tc: "#000"}
 };
 
 let doorSide = "左";
 let voices = [];
 
-// 音声初期化（Chrome対応）
 function loadVoices() {
     voices = window.speechSynthesis.getVoices();
 }
 if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = loadVoices;
 }
-loadVoices();
 
-// 起動処理
 UI.boot.onclick = () => {
     UI.boot.style.display = 'none';
-    speak("システムを起動しました。本日も安全運転をお願いいたします。");
+    speak("システムを同期しました。運行管理を開始します。");
 };
 
 function speak(ja, en = "") {
@@ -61,23 +65,33 @@ function update() {
     const type = UI.typeSel.value;
     const curIdx = parseInt(UI.curStSel.value);
 
+    // バッジ更新
     UI.typeBadge.textContent = meta[type].n;
     UI.typeBadge.style.backgroundColor = meta[type].c;
+    UI.typeBadge.style.color = meta[type].tc || "#fff";
+    
+    // 行先更新
     UI.destDisp.textContent = route[route.length - 1].name;
 
-    const next = route.slice(curIdx + 1).find(s => s[type]);
+    // 次駅判定（修学旅行・試運転は全駅停車として計算）
+    const next = route.slice(curIdx + 1).find(s => (type === 'school' || type === 'trial' || type === 'extra' ? true : s[type]));
+    
     if(next) {
         UI.lcdName.textContent = next.name;
         UI.lcdEn.textContent = next.en;
-        if(next.transfer) setTelop(`次は、${next.name}、${next.name}です。${next.transfer}はお乗り換えです。`);
+        if(type === 'school') {
+            setTelop(`【修学旅行】次は ${next.name} です。思い出に残る旅を！`);
+        }
     } else {
         UI.lcdName.textContent = "終点"; UI.lcdEn.textContent = "TERMINAL";
     }
 
+    // 路線図更新
     UI.routeMap.innerHTML = '';
     route.forEach((st, i) => {
         const d = document.createElement('div');
-        d.className = 'dot' + (st[type] ? ' stop' : '') + (i === curIdx ? ' active' : '');
+        const isStop = (type === 'school' || type === 'trial' || type === 'extra' ? true : st[type]);
+        d.className = 'dot' + (isStop ? ' stop' : '') + (i === curIdx ? ' active' : '');
         UI.routeMap.appendChild(d);
     });
 }
@@ -86,8 +100,7 @@ function playAnn(mode) {
     const route = UI.dirSel.value === 'up' ? [...stations].reverse() : [...stations];
     const type = UI.typeSel.value;
     const curIdx = parseInt(UI.curStSel.value);
-    const next = route.slice(curIdx + 1).find(s => s[type]);
-    if(!next && ['pre','next','soon','wait'].includes(mode)) return;
+    const next = route.slice(curIdx + 1).find(s => (type === 'school' || type === 'trial' || type === 'extra' ? true : s[type]));
 
     switch(mode) {
         case 'pre':
@@ -102,17 +115,27 @@ function playAnn(mode) {
             speak(`まもなく、${next.yomi}、${next.yomi}です。お出口は${doorSide}側です。${tr}`, 
                   `We will soon make a brief stop at ${next.en}. The doors on the ${doorSide === '左'?'left':'right'} side will open.`);
             break;
+        case 'school_greet':
+            speak("本日は修学旅行でのご利用、誠にありがとうございます。思い出に残る楽しい旅となりますよう、乗務員一同お手伝いさせていただきます。", 
+                  "Welcome on board our School Trip special train.");
+            break;
+        case 'school_dest':
+            speak(`この電車は、団体専用、修学旅行列車、${route[route.length-1].yomi}ゆきです。一般のお客様はご乗車になれません。`);
+            break;
+        case 'accident':
+            speak("現在、前を走る電車に急病人が発生したため、一時停車しております。運転再開までしばらくお待ちください。");
+            setTelop("【運行情報】急病人対応のため、一時停車中。");
+            break;
+        case 'earthquake':
+            speak("ただいま強い地震が発生しました。急停車します、ご注意ください！");
+            emergency();
+            break;
+        case 'delay': speak("列車が遅れまして、ご迷惑をおかけしております。"); break;
         case 'door': speak("ドアが閉まります。ご注意ください。"); break;
         case 'chime': UI.chime.play(); break;
-        case 'wait': speak("この駅で、電車の待ち合わせをいたします。発車までしばらくお待ちください。"); break;
-        case 'manner': speak("車内では、携帯電話をマナーモードに設定のうえ、通話はご遠慮ください。ご協力をお願いします。"); break;
-        case 'delay': speak("列車が遅れまして、ご迷惑をおかけしております。"); break;
+        case 'manner': speak("車内では、携帯電話をマナーモードに設定のうえ、通話はご遠慮ください。"); break;
+        case 'wait': speak("この駅で、電車の待ち合わせをいたします。"); break;
     }
-}
-
-function toggleMelody() {
-    if(UI.mel.paused) { UI.mel.play(); document.getElementById('melBtn').style.background = "#505"; }
-    else { UI.mel.pause(); UI.mel.currentTime = 0; document.getElementById('melBtn').style.background = ""; }
 }
 
 function toggleSide() {
@@ -120,24 +143,19 @@ function toggleSide() {
     UI.sideBtn.textContent = `出口：${doorSide}`;
 }
 
+function toggleMelody() {
+    if(UI.mel.paused) { UI.mel.play(); document.getElementById('melBtn').classList.add('active'); }
+    else { UI.mel.pause(); UI.mel.currentTime = 0; document.getElementById('melBtn').classList.remove('active'); }
+}
+
 function toggleNight() { document.body.classList.toggle('night-mode'); }
 function setTelop(t) { UI.telop.textContent = t; }
 
 function emergency() {
     UI.emer.style.display = 'flex';
-    UI.alertTxt.textContent = "防護無線を受信しました。";
+    UI.alertTxt.textContent = "緊急停止信号を受信。周囲を確認してください。";
     speak("急停車します！ご注意ください！");
 }
-
-window.addEventListener('storage', (e) => {
-    if(e.key === 'dispatch_cmd') {
-        const d = JSON.parse(e.newValue);
-        UI.emer.style.display = 'flex';
-        UI.alertTxt.textContent = d.msg;
-        speak("業務連絡。指令より入電。" + d.msg);
-        setTimeout(() => { if(!d.msg.includes("停止")) UI.emer.style.display = 'none'; }, 7000);
-    }
-});
 
 UI.dirSel.onchange = () => {
     const route = UI.dirSel.value === 'up' ? [...stations].reverse() : [...stations];
