@@ -1,18 +1,18 @@
 const UI = {
     lcdName: document.getElementById('lcdName'),
     lcdEn: document.getElementById('lcdEn'),
-    typeBadge: document.getElementById('typeBadge'),　
+    typeBadge: document.getElementById('typeBadge'),
     destDisp: document.getElementById('destDisp'),
     routeMap: document.getElementById('routeMap'),
     telop: document.getElementById('telopTxt'),
     curStSel: document.getElementById('curStSel'),
-    typeSel: document.getElementById('typeSel'),　
+    typeSel: document.getElementById('typeSel'),
     dirSel: document.getElementById('dirSel'),
     mel: document.getElementById('melAudio'),
     chime: document.getElementById('chimeAudio'),
     sideBtn: document.getElementById('sideBtn'),
     boot: document.getElementById('boot'),
-    bootBtn: document.getElementById('bootBtn'), // 追加
+    bootBtn: document.getElementById('bootBtn'),
     emer: document.getElementById('emergencyMsg'),
     alertTxt: document.getElementById('alertTxt'),
     clock: document.getElementById('clock')
@@ -33,7 +33,7 @@ const meta = {
 let doorSide = "左";
 let voices = [];
 
-// 音声読み込み
+// 音声エンジン初期化
 function loadVoices() {
     voices = window.speechSynthesis.getVoices();
 }
@@ -41,16 +41,17 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = loadVoices;
 }
 
-// 起動ボタン：デザインに合わせたフェードアウト処理
+// 起動シーケンス
 UI.bootBtn.onclick = () => {
     UI.boot.style.opacity = '0';
     UI.boot.style.transition = 'opacity 0.8s ease';
     setTimeout(() => {
         UI.boot.style.display = 'none';
-        speak("システムオンライン。運行管理を開始します。");
+        speak("システムオンライン。本日も安全運転をお願いいたします。");
     }, 800);
 };
 
+// 音声合成（日本語 -> 英語）
 function speak(ja, en = "") {
     window.speechSynthesis.cancel();
     const uJa = new SpeechSynthesisUtterance(ja);
@@ -67,42 +68,51 @@ function speak(ja, en = "") {
     window.speechSynthesis.speak(uJa);
 }
 
+// 表示更新ロジック
 function update() {
     const route = UI.dirSel.value === 'up' ? [...stations].reverse() : [...stations];
     const type = UI.typeSel.value;
     const curIdx = parseInt(UI.curStSel.value);
 
+    // 種別バッジ
     UI.typeBadge.textContent = meta[type].n;
     UI.typeBadge.style.backgroundColor = meta[type].c;
     UI.typeBadge.style.color = meta[type].tc || "#fff";
+    
+    // 行先
     UI.destDisp.textContent = route[route.length - 1].name;
 
-    const next = route.slice(curIdx + 1).find(s => (type === 'school' || type === 'trial' || type === 'extra' ? true : s[type]));
+    // 次駅・停車駅判定
+    const next = route.slice(curIdx + 1).find(s => (['school', 'trial', 'extra'].includes(type) ? true : s[type]));
     
     if(next) {
         UI.lcdName.textContent = next.name;
         UI.lcdEn.textContent = next.en;
+        // 修学旅行時の自動テロップ
         if(type === 'school') {
-            setTelop(`【修学旅行】次は ${next.name} です。思い出に残る旅を！`);
+            setTelop(`【修学旅行】次は ${next.name} です。思い出に残る楽しい旅を！`);
         }
     } else {
-        UI.lcdName.textContent = "終点"; UI.lcdEn.textContent = "TERMINAL";
+        UI.lcdName.textContent = "終点"; 
+        UI.lcdEn.textContent = "TERMINAL";
     }
 
+    // 路線図ドット更新
     UI.routeMap.innerHTML = '';
     route.forEach((st, i) => {
         const d = document.createElement('div');
-        const isStop = (type === 'school' || type === 'trial' || type === 'extra' ? true : st[type]);
+        const isStop = (['school', 'trial', 'extra'].includes(type) ? true : st[type]);
         d.className = 'dot' + (isStop ? ' stop' : '') + (i === curIdx ? ' active' : '');
         UI.routeMap.appendChild(d);
     });
 }
 
+// 放送コントロール（全ボタン対応）
 function playAnn(mode) {
     const route = UI.dirSel.value === 'up' ? [...stations].reverse() : [...stations];
     const type = UI.typeSel.value;
     const curIdx = parseInt(UI.curStSel.value);
-    const next = route.slice(curIdx + 1).find(s => (type === 'school' || type === 'trial' || type === 'extra' ? true : s[type]));
+    const next = route.slice(curIdx + 1).find(s => (['school', 'trial', 'extra'].includes(type) ? true : s[type]));
 
     switch(mode) {
         case 'pre':
@@ -117,51 +127,55 @@ function playAnn(mode) {
             speak(`まもなく、${next.yomi}、${next.yomi}です。お出口は${doorSide}側です。${tr}`, 
                   `We will soon make a brief stop at ${next.en}. The doors on the ${doorSide === '左'?'left':'right'} side will open.`);
             break;
-        case 'school_greet':
-            speak("本日は修学旅行でのご利用、誠にありがとうございます。思い出に残る楽しい旅となりますよう、乗務員一同お手伝いさせていただきます。");
-            setTelop("【修学旅行】本日は館浜電鉄をご利用いただきありがとうございます。");
-            break;
-        case 'accident':
-            speak("現在、前を走る電車に急病人が発生したため、一時停車しております。");
-            setTelop("【運行情報】急病人対応のため、一時停車中。");
-            break;
-        case 'earthquake':
-            speak("ただいま強い地震が発生しました。急停車します！");
-            emergency();
-            break;
-        case 'delay': speak("列車が遅れまして、ご迷惑をおかけしております。"); break;
         case 'door': speak("ドアが閉まります。ご注意ください。"); break;
         case 'chime': UI.chime.play(); break;
-        case 'manner': speak("車内では携帯電話をマナーモードに設定のうえ、通話はご遠慮ください。"); break;
-        case 'wait': speak("この駅で電車の待ち合わせをいたします。"); break;
+        case 'wait': speak("この駅で、電車の待ち合わせをいたします。発車までしばらくお待ちください。"); break;
+        case 'manner': speak("車内では、携帯電話をマナーモードに設定のうえ、通話はご遠慮ください。ご協力をお願いします。"); break;
+        case 'delay': speak("列車が遅れまして、ご迷惑をおかけしております。"); break;
+        case 'school_greet':
+            speak("本日は修学旅行でのご利用、誠にありがとうございます。思い出に残る楽しい旅となりますよう、乗務員一同お手伝いさせていただきます。");
+            setTelop("✨ WELCOME ✨ 楽しい修学旅行の思い出を！");
+            break;
+        case 'accident':
+            speak("現在、前を走る電車に急病人が発生したため、一時停車しております。運転再開までしばらくお待ちください。");
+            setTelop("【運行情報】急病人対応のため、一時停車中。");
+            break;
     }
 }
 
+// ユーティリティ
 function toggleSide() {
     doorSide = (doorSide === "左") ? "右" : "左";
     UI.sideBtn.textContent = `出口：${doorSide}`;
 }
 
 function toggleMelody() {
-    if(UI.mel.paused) { 
-        UI.mel.play(); 
-        document.getElementById('melBtn').classList.add('active'); 
-    } else { 
-        UI.mel.pause(); 
-        UI.mel.currentTime = 0; 
-        document.getElementById('melBtn').classList.remove('active'); 
-    }
+    if(UI.mel.paused) { UI.mel.play(); document.getElementById('melBtn').classList.add('active'); }
+    else { UI.mel.pause(); UI.mel.currentTime = 0; document.getElementById('melBtn').classList.remove('active'); }
 }
 
 function toggleNight() { document.body.classList.toggle('night-mode'); }
+
 function setTelop(t) { UI.telop.textContent = t; }
 
 function emergency() {
     UI.emer.style.display = 'flex';
-    UI.alertTxt.textContent = "緊急停止信号を受信。周囲を確認してください。";
+    UI.alertTxt.textContent = "防護無線を受信しました。急停車します。";
     speak("急停車します！ご注意ください！");
 }
 
+// 指令コマンド受信
+window.addEventListener('storage', (e) => {
+    if(e.key === 'dispatch_cmd') {
+        const d = JSON.parse(e.newValue);
+        UI.emer.style.display = 'flex';
+        UI.alertTxt.textContent = d.msg;
+        speak("業務連絡。指令より入電。" + d.msg);
+        setTimeout(() => { if(!d.msg.includes("停止")) UI.emer.style.display = 'none'; }, 7000);
+    }
+});
+
+// セレクター連携
 UI.dirSel.onchange = () => {
     const route = UI.dirSel.value === 'up' ? [...stations].reverse() : [...stations];
     UI.curStSel.innerHTML = '';
@@ -174,5 +188,9 @@ UI.dirSel.onchange = () => {
 
 UI.typeSel.onchange = update;
 UI.curStSel.onchange = update;
+
+// 1秒ごとに時計更新
 setInterval(() => { UI.clock.textContent = new Date().toLocaleTimeString(); }, 1000);
+
+// 初期化実行
 UI.dirSel.onchange();
