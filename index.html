@@ -1,46 +1,58 @@
-<!DOCTYPE html>　
+<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">　
-    <title>館浜電鉄 運行管理システム Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TATEHAMA Train Management System</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div id="boot">
-    <h1 style="color:#0f0; font-size: 3rem; margin:0;">SYSTEM ONLINE</h1>
-    <p>画面をタップしてシステムを同期</p>
+    <div class="boot-content">
+        <div class="spinner"></div>
+        <h1 class="boot-logo">TTS<span>-Net</span></h1>
+        <div class="line"></div>
+        <p class="status-text">SYSTEM READY</p>
+        <button id="bootBtn">タッチしてシステムを起動</button>
+    </div>
 </div>
 
 <div class="lcd" id="lcdDisp">
     <div id="emergencyMsg">
-        <h1 style="font-size: 4rem; margin:0;">緊急停止 / EMERGENCY</h1>
-        <p id="alertTxt" style="font-size: 2rem;"></p>
+        <div class="emer-box">
+            <h1>EMERGENCY STOP</h1>
+            <p id="alertTxt"></p>
+        </div>
     </div>
     
     <div class="lcd-header">
         <div id="typeBadge" class="type-badge">普通</div>
-        <div style="font-size: 1.6rem;"><span id="destDisp">---</span> 行</div>
+        <div class="dest-info"><span id="destDisp">---</span> 行</div>
         <div id="clock" class="clock">00:00:00</div>
     </div>
 
     <div class="lcd-main">
-        <div class="next-label">Next Station</div>
+        <div class="next-label-container">
+            <span class="next-label-jp">次は</span>
+            <span class="next-label-en">Next</span>
+        </div>
         <div id="lcdName" class="st-name">準備中</div>
         <div id="lcdEn" class="st-en">Standing by</div>
     </div>
 
-    <div class="route-map" id="routeMap"></div>
-    <div class="telop"><div class="telop-txt" id="telopTxt">館浜電鉄をご利用いただきありがとうございます。</div></div>
+    <div class="route-container">
+        <div class="route-map" id="routeMap"></div>
+    </div>
+
+    <div class="telop">
+        <div class="telop-txt" id="telopTxt">館浜電鉄をご利用いただきありがとうございます。</div>
+    </div>
 </div>
 
 <div class="panel">
-    <div class="row">
-        <select id="dirSel">
-            <option value="down">下り (赤山町方面)</option>
-            <option value="up">上り (館浜方面)</option>
-        </select>
+    <div class="control-row main-selects">
+        <select id="dirSel"></select>
         <select id="typeSel">
             <option value="local">普通</option>
             <option value="semi">準急</option>
@@ -50,47 +62,42 @@
             <option value="ltd">特急</option>
             <option value="school">🎓 修学旅行</option>
             <option value="extra">📢 臨時</option>
-            <option value="trial">🛠 試運転</option>
         </select>
+        <select id="curStSel"></select>
     </div>
-    <div class="row"><select id="curStSel"></select></div>
 
-    <div class="grid">
-        <button onclick="playAnn('pre')" class="btn-green">🚉 発車前</button>
-        <button onclick="playAnn('next')" class="btn-green">📢 次駅放送</button>
-        <button onclick="playAnn('soon')" class="btn-green">🗣 まもなく</button>
-        <button id="sideBtn" onclick="toggleSide()" class="btn-gray">🚪 出口：左</button>
+    <div class="grid-container">
+        <div class="btn-group">
+            <button onclick="playAnn('pre')" class="btn-main">🚉 発車案内</button>
+            <button onclick="playAnn('next')" class="btn-main">📢 次駅放送</button>
+            <button onclick="playAnn('soon')" class="btn-main">🗣 まもなく</button>
+            <button id="sideBtn" onclick="toggleSide()" class="btn-sub">🚪 出口: 左</button>
+        </div>
 
-        <button onclick="toggleMelody()" id="melBtn" class="btn-blue">♪ 発車メロ</button>
-        <button onclick="playAnn('chime')" class="btn-blue">🔔 チャイム</button>
-        <button onclick="playAnn('door')" class="btn-blue">🚪 扉閉放送</button>
-        <button onclick="toggleNight()" class="btn-yellow">🌙 夜間モード</button>
+        <div class="btn-group">
+            <button onclick="toggleMelody()" id="melBtn" class="btn-blue">♪ 発車メロ</button>
+            <button onclick="playAnn('chime')" class="btn-blue">🔔 チャイム</button>
+            <button onclick="playAnn('door')" class="btn-blue">🚪 扉閉放送</button>
+            <button onclick="toggleNight()" class="btn-dark">🌙 夜間モード</button>
+        </div>
 
-        <button onclick="playAnn('school_greet')" style="background:#d63384">🎓 旅行挨拶</button>
-        <button onclick="playAnn('school_dest')" style="background:#d63384">🚌 団体案内</button>
-        <button onclick="playAnn('wait')" class="btn-blue">🚥 待避案内</button>
-        <button onclick="playAnn('manner')" class="btn-blue">ℹ️ マナー</button>
+        <div class="btn-group">
+            <button onclick="playAnn('school_greet')" class="btn-pink">🎓 旅行挨拶</button>
+            <button onclick="playAnn('accident')" class="btn-orange">⚠️ 急病人</button>
+            <button onclick="playAnn('delay')" class="btn-orange">⏳ 遅延詫び</button>
+            <button onclick="speechSynthesis.cancel()" class="btn-black">🔇 停止</button>
+        </div>
 
-        <button onclick="playAnn('delay')" class="btn-orange">⚠️ 遅延お詫び</button>
-        <button onclick="playAnn('accident')" class="btn-red">💥 輸送障害</button>
-        <button onclick="playAnn('earthquake')" class="btn-red">⚠️ 地震警戒</button>
-        <button onclick="speechSynthesis.cancel()" class="btn-black">停止</button>
-
-        <button onclick="setTelop('駆け込み乗車は大変危険です。無理なご乗車はおやめください。')" class="btn-orange">⚠️ 警告テロップ</button>
-        <button onclick="setTelop('【修学旅行】思い出に残る楽しい旅を！')" style="background:#d63384">✨ 旅行テロップ</button>
-        <button onclick="emergency()" class="btn-red" style="grid-column: span 2; font-size: 1.2rem;">🚨 非常停止</button>
+        <div class="btn-group full-width">
+            <button onclick="emergency()" class="btn-red">🚨 非常ブレーキ緊急停止</button>
+        </div>
     </div>
 </div>
 
-<audio id="melAudio" src="sounds/melody.mp3"></audio>　
+<audio id="melAudio" src="sounds/melody.mp3"></audio>
 <audio id="chimeAudio" src="sounds/chime.mp3"></audio>
 
 <script src="stations.js"></script>
 <script src="app.js"></script>
-<script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('service-worker.js');
-    }
-</script>
 </body>
 </html>
