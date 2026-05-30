@@ -5,7 +5,7 @@
     --panel: #1a1a1a;
     --green: #00ff00;
 }
-
+　
 body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; }
 
 /* 起動画面 */　
