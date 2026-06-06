@@ -16,8 +16,8 @@ const UI = {
     emer: document.getElementById('emergencyMsg'),
     alertTxt: document.getElementById('alertTxt'),
     clock: document.getElementById('clock'),
-    // 💡 index.htmlの追加パーツ（QR用）を完全紐付け
-    qrPopup: document.getElementById('qrPopup'),
+    // 💡 全画面QRモニター用要素
+    qrFullMonitor: document.getElementById('qrFullMonitor'),
     qrImg: document.getElementById('qrImg')
 };
 
@@ -36,7 +36,6 @@ const meta = {
 let doorSide = "左";
 let voices = [];
 
-// 音声エンジン初期化
 function loadVoices() {
     voices = window.speechSynthesis.getVoices();
 }
@@ -44,7 +43,6 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = loadVoices;
 }
 
-// 起動シーケンス
 UI.bootBtn.onclick = () => {
     UI.boot.style.opacity = '0';
     UI.boot.style.transition = 'opacity 0.8s ease';
@@ -54,7 +52,6 @@ UI.bootBtn.onclick = () => {
     }, 800);
 };
 
-// 音声合成（日本語 -> 英語）
 function speak(ja, en = "") {
     window.speechSynthesis.cancel();
     const uJa = new SpeechSynthesisUtterance(ja);
@@ -71,27 +68,22 @@ function speak(ja, en = "") {
     window.speechSynthesis.speak(uJa);
 }
 
-// 表示更新ロジック
 function update() {
     const route = UI.dirSel.value === 'up' ? [...stations].reverse() : [...stations];
     const type = UI.typeSel.value;
     const curIdx = parseInt(UI.curStSel.value);
 
-    // 種別バッジ
     UI.typeBadge.textContent = meta[type].n;
     UI.typeBadge.style.backgroundColor = meta[type].c;
     UI.typeBadge.style.color = meta[type].tc || "#fff";
     
-    // 行先
     UI.destDisp.textContent = route[route.length - 1].name;
 
-    // 次駅・停車駅判定
     const next = route.slice(curIdx + 1).find(s => (['school', 'trial', 'extra'].includes(type) ? true : s[type]));
     
     if(next) {
         UI.lcdName.textContent = next.name;
         UI.lcdEn.textContent = next.en;
-        // 修学旅行時の自動テロップ
         if(type === 'school') {
             setTelop(`【修学旅行】次は ${next.name} です。思い出に残る楽しい旅を！`);
         }
@@ -100,7 +92,6 @@ function update() {
         UI.lcdEn.textContent = "TERMINAL";
     }
 
-    // 路線図ドット更新
     UI.routeMap.innerHTML = '';
     route.forEach((st, i) => {
         const d = document.createElement('div');
@@ -110,7 +101,6 @@ function update() {
     });
 }
 
-// 放送コントロール（全ボタン対応・QR一括自動生成強化）
 function playAnn(mode) {
     const route = UI.dirSel.value === 'up' ? [...stations].reverse() : [...stations];
     const type = UI.typeSel.value;
@@ -136,7 +126,6 @@ function playAnn(mode) {
         case 'manner': speak("車内では、携帯電話をマナーモードに設定のうえ、通話はご遠慮ください。ご協力をお願いします。"); break;
         
         case 'delay': 
-            // 💡 運行指令設定パネルから全項目をリアルタイム抽出し、スマホにそのまま投げる超拡張ロジック
             const infoStatus = document.getElementById('infoStatusSel')?.value || "delay";
             const delayMin = document.getElementById('delayMinInput')?.value || "15";
             const resumeTime = document.getElementById('resumeTimeSel')?.value || "未定";
@@ -147,7 +136,6 @@ function playAnn(mode) {
             let speechTxt = "";
             let timeParam = delayMin;
 
-            // コントロールパネルの選択状態に合わせて、タブレットが喋るお詫び放送の文章を分岐生成
             if (infoStatus === "delay") {
                 speechTxt = `列車が遅れましてご迷惑をおかけしております。${delaySection}間は、${delayReason}の影響のため、現在約${delayMin}分遅れております。`;
                 timeParam = delayMin;
@@ -162,21 +150,16 @@ function playAnn(mode) {
                 setTelop(`【計画運休】終日休止：${delaySection}間（${delayReason}）`);
             }
 
-            // 合成音声でお詫び案内を発生
             speak(speechTxt);
 
-            // 💡 スマホのdelay.htmlへ全バリエーション状態を通知する暗号URL作成
-            // 本番環境に合わせた絶対パス、またはGitHub Pages等のURL構造を動的に組み立て可能
+            // URLパラメータ生成
             const baseUrl = window.location.href.replace('index.html', 'delay.html').split('?')[0];
             const targetUrl = `${baseUrl}?status=${infoStatus}&time=${encodeURIComponent(timeParam)}&reason=${encodeURIComponent(delayReason)}&sec=${encodeURIComponent(delaySection)}&detail=${encodeURIComponent(customDetail)}`;
             
-            // 操作盤の画面中央にQRコードポップアップを表示
-            if(UI.qrPopup && UI.qrImg) {
-                UI.qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(targetUrl)}`;
-                UI.qrPopup.style.display = 'block';
-                
-                // 25秒間表示し、スマホスキャンを終えた頃に自動的にフェードアウトして閉じる
-                setTimeout(() => { UI.qrPopup.style.display = 'none'; }, 25000);
+            // 💡 新演出：全画面QRコードモニターを起動
+            if(UI.qrFullMonitor && UI.qrImg) {
+                UI.qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(targetUrl)}`;
+                UI.qrFullMonitor.style.display = 'flex';
             }
             break;
 
@@ -191,9 +174,16 @@ function playAnn(mode) {
     }
 }
 
-// ユーティリティ
+// 💡 全画面モニターを閉じる用グローバル関数
+function closeQrMonitor() {
+    if(UI.qrFullMonitor) {
+        UI.qrFullMonitor.style.display = 'none';
+    }
+}
+
 function toggleSide() {
-    doorSide = (doorSide === "左") ? "右" : "左";
+    doorSide = (doorSide === "左") ? "右" : "safe";
+    doorSide = (doorSide === "右") ? "左" : "右";
     UI.sideBtn.textContent = `出口：${doorSide}`;
 }
 
@@ -203,7 +193,6 @@ function toggleMelody() {
 }
 
 function toggleNight() { document.body.classList.toggle('night-mode'); }
-
 function setTelop(t) { UI.telop.textContent = t; }
 
 function emergency() {
@@ -212,7 +201,6 @@ function emergency() {
     speak("急停車します！ご注意ください！");
 }
 
-// 指令コマンド受信
 window.addEventListener('storage', (e) => {
     if(e.key === 'dispatch_cmd') {
         const d = JSON.parse(e.newValue);
@@ -223,7 +211,6 @@ window.addEventListener('storage', (e) => {
     }
 });
 
-// セレクター連携
 UI.dirSel.onchange = () => {
     const route = UI.dirSel.value === 'up' ? [...stations].reverse() : [...stations];
     UI.curStSel.innerHTML = '';
@@ -237,8 +224,5 @@ UI.dirSel.onchange = () => {
 UI.typeSel.onchange = update;
 UI.curStSel.onchange = update;
 
-// 1秒ごとに時計更新
 setInterval(() => { UI.clock.textContent = new Date().toLocaleTimeString(); }, 1000);
-
-// 初期化実行
 UI.dirSel.onchange();
