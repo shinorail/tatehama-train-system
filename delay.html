@@ -255,7 +255,7 @@
         modalText.innerHTML = `上記特定の事象および長期不通を理由として、対象区間の列車運行が予定通り休止されたことを館浜電鉄として証明いたします。`;
         certStamp.textContent = "計画運休/休止";
 
-    } else {
+   } else {
         // ==========================================
         // バリエーションC：通常の遅延（ダイヤ乱れ）
         // ==========================================
@@ -269,6 +269,7 @@
         // 分数表示の調整（「分」の文字重複を考慮）
         let formattedTime = timeInfo.includes("分") ? timeInfo : `${timeInfo}分`;
 
+        // 💡 ここを完全に変数（formattedTime）連動に修正しました！
         bodyEl.innerHTML = `
             <p><span class="line-name">館浜電鉄線</span></p>
             <p>本日、<strong>${reason}</strong>の影響により、<strong>${section}</strong>の上下線の一部列車に、<span class="highlight-txt">約${formattedTime}</span>の遅れが出ております。</p>
@@ -285,7 +286,6 @@
         modalText.textContent = `本日、上記区間において館浜電鉄線の列車が遅延したことを公式に証明いたします。`;
         certStamp.textContent = `最大 ${formattedTime} 遅延`;
     }
-
     // 4. アニメーション演出処理
     function showCertificate(e) {
         e.preventDefault();
