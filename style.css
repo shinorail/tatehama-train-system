@@ -13,16 +13,22 @@
 }
 
 /* --- ベース設定 --- */
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
 body {
     background: var(--bg-dark);
     color: var(--text-white);
     font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
     margin: 0;
+    padding: 0;
     overflow: hidden;
     touch-action: manipulation; /* スマホ誤操作防止 */
 }
 
-/* --- 起動画面 (Boot Screen)：画像のデザインを再現 --- */
+/* --- 起動画面 (Boot Screen) --- */
 #boot {
     position: fixed;
     inset: 0;
@@ -42,6 +48,29 @@ body {
     margin: 0; 
     letter-spacing: 2px;
 }
+.boot-logo span {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #333;
+    border-top: 4px solid #00ff00;
+    border-radius: 50%;
+    margin: 0 auto 20px auto;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.line {
+    height: 2px;
+    background: #333;
+    margin: 15px 0;
+}
 .status-text {
     color: #fff;
     font-size: 1.2rem;
@@ -56,6 +85,7 @@ body {
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    width: 100%;
 }
 
 /* --- 車内表示器 (LCD)：実車風のクオリティ --- */
@@ -121,7 +151,7 @@ body {
 }
 
 /* テロップスクロール */
-.telop { background: #000; color: #fff; height: 35px; line-height: 35px; font-size: 1.3rem; position: relative; }
+.telop { background: #000; color: #fff; height: 35px; line-height: 35px; font-size: 1.3rem; position: relative; overflow: hidden; }
 .telop-txt { 
     position: absolute; 
     white-space: nowrap; 
@@ -138,10 +168,11 @@ body {
     flex-direction: column;
     gap: 8px;
     background: var(--panel-bg);
+    overflow-y: auto;
 }
 
 .control-row { display: flex; gap: 6px; }
-select {
+.main-selects select {
     flex: 1;
     background: #333;
     color: #fff;
@@ -149,6 +180,22 @@ select {
     padding: 12px;
     border-radius: 4px;
     font-size: 0.9rem;
+}
+
+/* 💡 追加：大増設された運行情報コントロール用入力フォームのデザイン定義 */
+.control-row input[type="text"]::placeholder {
+    color: #777;
+}
+.control-row input[type="number"],
+.control-row input[type="text"],
+.control-row select {
+    outline: none;
+    transition: border-color 0.2s;
+}
+.control-row input[type="number"]:focus,
+.control-row input[type="text"]:focus,
+.control-row select:focus {
+    border-color: var(--accent-blue) !important;
 }
 
 .grid-container { display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
@@ -163,7 +210,7 @@ button {
     font-weight: bold;
     font-size: 0.8rem;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s, transform 0.1s;
 }
 
 button:active { background: #666; transform: translateY(2px); }
@@ -185,7 +232,10 @@ button:active { background: #666; transform: translateY(2px); }
 
 /* 状態クラス */
 .active { background: #00ff00 !important; color: #000 !important; }
+
+/* 夜間モード：インラインでポップアップするQRコードを巻き添えにしないための除外指定処理 */
 .night-mode { filter: brightness(0.4) contrast(1.2); }
+.night-mode #qrPopup { filter: brightness(2.5) contrast(0.8); } /* QRコードは夜間でもスキャンできるように明度を自動維持 */
 
 /* --- 緊急停止 (Emergency Overlay) --- */
 #emergencyMsg {
@@ -212,6 +262,15 @@ button:active { background: #666; transform: translateY(2px); }
 @keyframes flash {
     0%, 100% { background: rgba(180, 0, 0, 0.9); }
     50% { background: rgba(80, 0, 0, 0.9); }
+}
+
+/* 💡 追加：操作パネル中央に開くQRコード表示領域のスマホ最適化アニメーション */
+#qrPopup {
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+@keyframes popIn {
+    0% { transform: translate(-50%, -40%) scale(0.85); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
 /* スクロールバーの非表示（パネルがはみ出た場合用） */
