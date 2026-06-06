@@ -10,12 +10,14 @@
             --th-blue: #0056b3;
             --th-orange: #f39800;
             --th-red: #d90000;
+            --th-dark-red: #7a0000;
             --bg-gray: #f4f6f9;
             --card-bg: #ffffff;
             --text-main: #222222;
             --text-sub: #666666;
             --border-color: #e0e4ec;
-            --theme-color: var(--th-orange); /* 動的変更用 */
+            --theme-color: var(--th-orange);
+            --theme-bg: #fffcf5;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -33,15 +35,24 @@
 
         .container { padding: 16px; max-width: 540px; margin: 0 auto; }
 
+        /* 運行状況掲示カード */
         .status-card {
             background: var(--card-bg); border-radius: 12px;
             border-top: 6px solid var(--theme-color); padding: 20px 16px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 16px;
+            background-color: var(--theme-bg);
+            transition: all 0.3s ease;
         }
 
         .status-title {
-            font-size: 1.25rem; font-weight: bold; color: var(--theme-color);
+            font-size: 1.3rem; font-weight: bold; color: var(--theme-color);
             margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;
+        }
+
+        /* 状況に応じた警告マークのバッジ */
+        .status-icon-badge {
+            display: inline-block; padding: 2px 10px; border-radius: 20px;
+            color: #fff; font-size: 0.85rem; font-weight: bold;
         }
 
         .update-time {
@@ -52,30 +63,38 @@
         .line-name {
             display: inline-block; background-color: #e6f0fa; color: var(--th-blue);
             padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.9rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
-        .badge-danger {
-            background-color: var(--th-red) !important; color: #fff !important;
-        }
+        .badge-danger { background-color: var(--th-red) !important; color: #fff !important; }
+        .badge-dark { background-color: var(--th-dark-red) !important; color: #fff !important; }
 
         .highlight-txt {
             color: var(--theme-color); font-size: 1.2rem; font-weight: 900;
             border-bottom: 2px solid var(--theme-color); padding: 0 2px;
         }
 
-        /* 証書発行用カスタムボタン */
+        /* 自由手入力情報用の特設トピックス枠 */
+        .custom-info-box {
+            margin-top: 15px; padding: 12px; background: #fff;
+            border-left: 4px solid var(--theme-color); border-radius: 4px;
+            font-size: 0.9rem; color: #444; box-shadow: inset 0 0 4px rgba(0,0,0,0.02);
+        }
+
+        /* アクションボタン（証明書・振替票） */
         .cert-btn {
             display: flex; align-items: center; justify-content: center; gap: 8px;
             background-color: #ffffff; border: 2px solid var(--theme-color); color: var(--theme-color);
             text-align: center; padding: 14px; border-radius: 8px; font-weight: bold;
             font-size: 1rem; text-decoration: none; margin-top: 24px; transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        .cert-btn:active {
+        .cert-btn:not(:disabled):active {
             background-color: var(--theme-color); color: #ffffff; transform: scale(0.98);
         }
 
-        /* モーダル */
+        /* モーダルポップアップ */
         #certModal {
             display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
             backdrop-filter: blur(4px); justify-content: center; align-items: center;
@@ -102,11 +121,12 @@
         .cert-date { font-size: 0.9rem; color: #444444; margin-bottom: 20px; }
         .cert-text { text-align: left; font-size: 0.9rem; line-height: 1.8; margin: 20px 0; }
 
+        /* スタンプ意匠 */
         .cert-stamp {
-            font-size: 1.2rem; font-weight: bold; color: var(--th-red);
+            font-size: 1.15rem; font-weight: bold; color: var(--th-red);
             border: 3px double var(--th-red); display: inline-block;
             padding: 6px 15px; margin: 12px 0; transform: rotate(-2deg);
-            border-radius: 4px; font-family: serif;
+            border-radius: 4px; font-family: serif; background-color: rgba(219, 0, 0, 0.02);
         }
 
         .close-btn {
@@ -120,51 +140,60 @@
 <header>館浜電鉄 列車運行情報</header>
 
 <div class="container">
-    <div class="status-card">
-        <div class="status-title" id="statusTitle">⚠️ ダイヤ乱れ</div>
+    <div class="status-card" id="statusCard">
+        <div class="status-title" id="statusTitle">
+            <span id="statusIcon" class="status-icon-badge" style="background-color: var(--th-orange);">⚠️</span>
+            <span id="titleText">列車運行情報</span>
+        </div>
         <div class="update-time">更新時間: <span id="liveTime">--:--:--</span></div>
         
         <div class="status-body" id="statusBody">
             </div>
 
         <a href="#" class="cert-btn" id="actionBtn" onclick="showCertificate(event)">
-            📄 証明書読込中...
+            📄 各種証明書を表示
         </a>
     </div>
 </div>
 
 <div id="certModal" onclick="closeCertificate()">
     <div class="cert-paper" onclick="event.stopPropagation()">
-        <h2 id="modalHeader">遅延証明書</h2>
+        <h2 id="modalHeader">各種証明書</h2>
         <div class="company-name">館浜電鉄株式会社</div>
         <div id="certDate" class="cert-date">----年 --月 --日</div>
         
         <p class="cert-text" id="modalText">
-            本日に限り、当社線において列車が遅延したことを証明いたします。
+            運行情報の詳細をご確認ください。
         </p>
         
         <div id="certStamp" class="cert-stamp">
             証明スタンプ
         </div>
         <br>
-        <button class="close-btn" onclick="closeCertificate()">閉じる</button>
+        <button class="close-btn" onclick="closeCertificate()">画面を閉じる</button>
     </div>
 </div>
 
 <script>
-    // 時間と日付のセット
+    // 1. 基本時刻・日付のリアルタイムセット
     const now = new Date();
     document.getElementById('liveTime').textContent = now.toLocaleTimeString();
     document.getElementById('certDate').textContent = `${now.getFullYear()}年 ${now.getMonth() + 1}月 ${now.getDate()}日 当日に限り有効`;
 
-    // パラメータ解析
+    // 2. パラメータの抽出
     const urlParams = new URLSearchParams(window.location.search);
     const status = urlParams.get('status') || "delay";
     const timeInfo = urlParams.get('time') || "15";
     const reason = urlParams.get('reason') || "急病人救護活動";
     const section = urlParams.get('sec') || "館浜〜赤山町";
+    
+    // 💡【新機能】もしアプリ側から「自由手入力」された詳細テキストがあれば受け取る
+    const customDetail = urlParams.get('detail') || "";
 
-    const titleEl = document.getElementById('statusTitle');
+    // DOM要素の取得
+    const cardEl = document.getElementById('statusCard');
+    const titleTextEl = document.getElementById('titleText');
+    const iconEl = document.getElementById('statusIcon');
     const bodyEl = document.getElementById('statusBody');
     const btnEl = document.getElementById('actionBtn');
     
@@ -172,53 +201,92 @@
     const modalText = document.getElementById('modalText');
     const certStamp = document.getElementById('certStamp');
 
-    // 💡 バリエーション分岐ロジック
+    // 3. 【全バリエーション自動条件分岐システム】
     if (status === "suspend") {
-        // --- 運転見合わせモード ---
+        // ==========================================
+        // バリエーションA：運転見合わせ（運行ストップ）
+        // ==========================================
         document.documentElement.style.setProperty('--theme-color', 'var(--th-red)');
-        titleEl.textContent = "❌ 運転見合わせ";
+        document.documentElement.style.setProperty('--theme-bg', '#fff5f5');
+        
+        iconEl.textContent = "❌";
+        iconEl.style.backgroundColor = "var(--th-red)";
+        titleTextEl.textContent = "運転見合わせ";
+        
         bodyEl.innerHTML = `
             <p><span class="line-name badge-danger">館浜電鉄線</span></p>
-            <p><strong>${section}</strong>の上下線は、<strong>${reason}</strong>のため、現在<span class="highlight-txt">運転を見合わせております。</span></p>
-            <p>運転再開は <strong class="highlight-txt">${timeInfo}</strong> を見込んでおりますが、作業状況により前後する可能性があります。</p>
+            <p><strong>${section}</strong>の上下線は、<span class="highlight-txt">${reason}</span>のため、現在<strong>運転を見合わせております。</strong></p>
+            <p>運転再開は <strong class="highlight-txt">${timeInfo}</strong> を見込んでおります。</p>
         `;
-        btnEl.textContent = "🎫 振替輸送票 (デジタル) を表示";
         
-        // モーダルの書き換え
+        // 自由テキスト入力があった場合の表示ブロック追加
+        if(customDetail) {
+            bodyEl.innerHTML += `<div class="custom-info-box">ℹ️ <strong>追加情報:</strong> ${customDetail}</div>`;
+        }
+        
+        btnEl.textContent = "🎫 デジタル振替輸送票を発行";
         modalHeader.textContent = "振替輸送票";
-        modalText.innerHTML = `運転見合わせに伴い、他社線および代行バスへの振替輸送を実施しております。<br><br><strong>【対象区間】</strong><br>${section}`;
-        certStamp.textContent = "振替実施中";
+        modalText.innerHTML = `運転見合わせに伴い、各提携交通機関（他社線・代行バス等）への振替輸送を実施しております。<br><br><strong>【対象区間】</strong><br>${section}<br><br>改札にて本画面を駅係員にご提示ください。`;
+        certStamp.textContent = "振替輸送実施";
+
+    } else if (status === "plan" || status === "long") {
+        // ==========================================
+        // バリエーションB：計画運休 / 長期不通（災害・台風など）
+        // ==========================================
+        document.documentElement.style.setProperty('--theme-color', 'var(--th-dark-red)');
+        document.documentElement.style.setProperty('--theme-bg', '#fceded');
         
-    } else if (status === "plan") {
-        // --- 計画運休モード（台風・災害・長期用） ---
-        document.documentElement.style.setProperty('--theme-color', 'var(--th-red)');
-        titleEl.textContent = "🛑 運転休止（計画運休）";
+        iconEl.textContent = "🛑";
+        iconEl.style.backgroundColor = "var(--th-dark-red)";
+        titleTextEl.textContent = "運転休止（計画運休）";
+        
         bodyEl.innerHTML = `
-            <p><span class="line-name badge-danger">館浜電鉄線</span></p>
-            <p><strong>${reason}</strong>が予想されるため、お客様の安全を最優先とし、<strong>${section}</strong>間は<span class="highlight-txt">終日運転を休止（運休）</span>いたします。</p>
-            <p>復旧および運転再開スケジュールは、気象・設備の安全確認が取れ次第、順次発表いたします。長期にわたる可能性がありますのでご注意ください。</p>
+            <p><span class="line-name badge-dark">館浜電鉄線</span></p>
+            <p><strong>${reason}</strong>の発生（または予報）に伴い、安全確保のため<strong>${section}</strong>の区間は<span class="highlight-txt">終日運転を休止（計画運休）</span>いたします。</p>
+            <p>運転再開の見込みは <strong class="highlight-txt">${timeInfo}</strong> となっております。最新の気象・復旧状況にご注意ください。</p>
         `;
-        btnEl.textContent = "📄 運休証明書を表示";
         
+        if(customDetail) {
+            bodyEl.innerHTML += `<div class="custom-info-box">📌 <strong>運休に関する特記事項:</strong> ${customDetail}</div>`;
+        }
+        
+        btnEl.textContent = "📄 運休・不通証明書を表示";
         modalHeader.textContent = "運休証明書";
-        modalText.innerHTML = `上記の事象に伴い、対象区間の列車が計画運休（終日休止）したことを証明いたします。`;
-        certStamp.textContent = "計画運休";
+        modalText.innerHTML = `上記特定の事象および長期不通を理由として、対象区間の列車運行が予定通り休止されたことを館浜電鉄として証明いたします。`;
+        certStamp.textContent = "計画運休/休止";
 
     } else {
-        // --- 通常の遅延モード ---
-        titleEl.textContent = "⚠️ ダイヤ乱れ（一部遅延）";
+        // ==========================================
+        // バリエーションC：通常の遅延（ダイヤ乱れ）
+        // ==========================================
+        document.documentElement.style.setProperty('--theme-color', 'var(--th-orange)');
+        document.documentElement.style.setProperty('--theme-bg', '#fffcf5');
+        
+        iconEl.textContent = "⚠️";
+        iconEl.style.backgroundColor = "var(--th-orange)";
+        titleTextEl.textContent = "ダイヤ乱れ（一部遅延）";
+        
+        // 分数表示の調整（「分」の文字重複を考慮）
+        let formattedTime = timeInfo.includes("分") ? timeInfo : `${timeInfo}分`;
+
         bodyEl.innerHTML = `
             <p><span class="line-name">館浜電鉄線</span></p>
-            <p>本日、<strong>${reason}</strong>により、<strong>${section}</strong>の上下線の一部列車に<strong class="highlight-min class="highlight-txt"">約${timeInfo}分</strong>の遅れが出ております。</p>
+            <p>本日、<strong>${reason}</strong>の影響により、<strong>${section}</strong>の上下線の一部列車に、<span class="highlight-txt">約${formattedTime}</span>の遅れが出ております。</p>
+            <p>ご利用のお客様には、大変なご不便とご迷惑をおかけいたします。目的駅まで気をつけてご乗車ください。</p>
         `;
-        btnEl.textContent = "📄 当日の遅延証明書を表示";
         
+        // 手入力追加情報
+        if(customDetail) {
+            bodyEl.innerHTML += `<div class="custom-info-box">💬 <strong>指令室からの伝達事項:</strong> ${customDetail}</div>`;
+        }
+        
+        btnEl.textContent = "📄 当日の遅延証明書を表示";
         modalHeader.textContent = "遅延証明書";
-        modalText.textContent = "本日に限り、当社線において列車が遅延したことを証明いたします。";
-        certStamp.textContent = `最大 ${timeInfo} 分遅延`;
+        modalText.textContent = `本日、上記区間において館浜電鉄線の列車が遅延したことを公式に証明いたします。`;
+        certStamp.textContent = `最大 ${formattedTime} 遅延`;
     }
 
-    // アニメーション制御
+    // 4. アニメーション演出処理
     function showCertificate(e) {
         e.preventDefault();
         const modal = document.getElementById('certModal');
@@ -233,5 +301,5 @@
     }
 </script>
 
-</body>
-</html>
+</body >
+</html >
