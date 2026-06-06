@@ -1,6 +1,6 @@
 const UI = {
     lcdName: document.getElementById('lcdName'),
-    lcdEn: document.getElementById('lcdEn'),
+    lcdEn: document.getElementById('lcdEn'),　
     typeBadge: document.getElementById('typeBadge'),
     destDisp: document.getElementById('destDisp'),　
     routeMap: document.getElementById('routeMap'),
