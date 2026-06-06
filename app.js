@@ -9,7 +9,7 @@ const UI = {
     typeSel: document.getElementById('typeSel'),
     dirSel: document.getElementById('dirSel'),
     mel: document.getElementById('melAudio'),
-    chime: document.getElementById('chimeAudio'),
+    chime: document.getElementById('chimeAudio'),　
     sideBtn: document.getElementById('sideBtn'),
     boot: document.getElementById('boot'),
     bootBtn: document.getElementById('bootBtn'),
