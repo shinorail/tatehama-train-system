@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>館浜電鉄 運行情報</title>
     <style>
-        /* --- 変数定義 --- */
+        /* --- 変数定義：スマートフォンに最適化したモダンな配色 --- */
         :root {
             --th-blue: #0056b3;
             --th-orange: #f39800;
@@ -183,12 +183,12 @@
     // 2. パラメータの抽出
     const urlParams = new URLSearchParams(window.location.search);
     const status = urlParams.get('status') || "delay";
-    const timeInfo = urlParams.get('time') || "15";
     const reason = urlParams.get('reason') || "急病人救護活動";
     const section = urlParams.get('sec') || "館浜〜赤山町";
-    
-    // 💡【新機能】もしアプリ側から「自由手入力」された詳細テキストがあれば受け取る
     const customDetail = urlParams.get('detail') || "";
+
+    // 💡【重要修正】minパラメータとtimeパラメータのどちらがきても「時間情報」として統合吸収するロジック
+    const timeInfo = urlParams.get('min') || urlParams.get('time') || "15";
 
     // DOM要素の取得
     const cardEl = document.getElementById('statusCard');
@@ -219,7 +219,6 @@
             <p>運転再開は <strong class="highlight-txt">${timeInfo}</strong> を見込んでおります。</p>
         `;
         
-        // 自由テキスト入力があった場合の表示ブロック追加
         if(customDetail) {
             bodyEl.innerHTML += `<div class="custom-info-box">ℹ️ <strong>追加情報:</strong> ${customDetail}</div>`;
         }
@@ -255,7 +254,7 @@
         modalText.innerHTML = `上記特定の事象および長期不通を理由として、対象区間の列車運行が予定通り休止されたことを館浜電鉄として証明いたします。`;
         certStamp.textContent = "計画運休/休止";
 
-   } else {
+    } else {
         // ==========================================
         // バリエーションC：通常の遅延（ダイヤ乱れ）
         // ==========================================
@@ -269,14 +268,12 @@
         // 分数表示の調整（「分」の文字重複を考慮）
         let formattedTime = timeInfo.includes("分") ? timeInfo : `${timeInfo}分`;
 
-        // 💡 ここを完全に変数（formattedTime）連動に修正しました！
         bodyEl.innerHTML = `
             <p><span class="line-name">館浜電鉄線</span></p>
             <p>本日、<strong>${reason}</strong>の影響により、<strong>${section}</strong>の上下線の一部列車に、<span class="highlight-txt">約${formattedTime}</span>の遅れが出ております。</p>
             <p>ご利用のお客様には、大変なご不便とご迷惑をおかけいたします。目的駅まで気をつけてご乗車ください。</p>
         `;
         
-        // 手入力追加情報
         if(customDetail) {
             bodyEl.innerHTML += `<div class="custom-info-box">💬 <strong>指令室からの伝達事項:</strong> ${customDetail}</div>`;
         }
@@ -286,6 +283,7 @@
         modalText.textContent = `本日、上記区間において館浜電鉄線の列車が遅延したことを公式に証明いたします。`;
         certStamp.textContent = `最大 ${formattedTime} 遅延`;
     }
+
     // 4. アニメーション演出処理
     function showCertificate(e) {
         e.preventDefault();
@@ -301,5 +299,5 @@
     }
 </script>
 
-</body >
-</html >
+</body>
+</html>
