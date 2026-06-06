@@ -152,10 +152,15 @@
     </div>
 </div>
 
-<div id="qrPopup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 4px solid #0056b3; padding: 20px; border-radius: 12px; text-align: center; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); min-width: 220px;">
-    <h3 style="margin: 0 0 10px 0; font-size: 1rem; color: #333;">📱 スマホ運行情報連携</h3>
-    <img id="qrImg" src="" alt="QRコード生成エラー" style="width: 160px; height: 160px; display: inline-block;">
-    <p style="margin: 10px 0 0 0; font-size: 0.75rem; color: #666; font-weight: bold;">スマホでスキャンして同期</p>
+<div id="qrFullMonitor">
+    <div class="qr-monitor-card">
+        <h2>📱 スマートフォン運行情報連携</h2>
+        <div class="qr-wrapper">
+            <img id="qrImg" src="" alt="QRコード生成中...">
+        </div>
+        <p class="qr-desc">上記のQRコードをスマートフォンのカメラで読み取ると、リアルタイムの遅延・運行状況が端末に同期されます。</p>
+        <button id="closeQrBtn" onclick="closeQrMonitor()">❌ 案内画面を閉じる (操作盤に戻る)</button>
+    </div>
 </div>
 
 <audio id="melAudio" src="sounds/melody.mp3"></audio>
@@ -183,7 +188,6 @@
             label.textContent = "運行計画:";
             numInput.style.display = 'none';
             selInput.style.display = 'inline-block';
-            // 計画運休時は自動でセレクトボックスを「終日」にセットして分かりやすくする誘導
             document.getElementById('resumeTimeSel').value = "終日";
         }
     });
