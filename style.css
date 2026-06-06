@@ -275,3 +275,40 @@ button:active { background: #666; transform: translateY(2px); }
 
 /* スクロールバーの非表示（パネルがはみ出た場合用） */
 .panel::-webkit-scrollbar { display: none; }
+/* ==========================================
+   QRコードポップアップ用の最前面表示レイアウト
+   ========================================== */
+#qrPopup {
+    display: none;              /* 初期状態は非表示（JSで制御） */
+    position: fixed;            /* 画面に対して絶対位置で固定 */
+    top: 50% !important;        /* 画面の上下中央 */
+    left: 50% !important;       /* 画面の左右中央 */
+    transform: translate(-50%, -50%) !important; /* 中央ぴったりに配置調整 */
+    background: #ffffff !important; /* 背景は純白 */
+    border: 4px solid #0056b3 !important; /* 館浜ブルーの太枠 */
+    padding: 20px !important;
+    border-radius: 12px !important;
+    text-align: center !important;
+    z-index: 99999 !important;   /* 💡最重要：他の全てのボタンやLCDより手前に出す */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8) !important; /* くっきりした影 */
+    min-width: 220px !important;
+}
+
+/* ポップアップ内の文字デザイン調整 */
+#qrPopup h3 {
+    margin: 0 0 10px 0 !important;
+    font-size: 1.1rem !important;
+    color: #222222 !important;
+    font-weight: bold !important;
+}
+
+#qrPopup p {
+    margin: 10px 0 0 0 !important;
+    font-size: 0.8rem !important;
+    color: #666666 !important;
+}
+
+/* 夜間モードでもQRコードの白さを維持する処理 */
+.night-mode #qrPopup {
+    filter: brightness(1) contrast(1) !important;
+}
