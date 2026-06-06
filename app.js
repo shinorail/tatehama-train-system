@@ -15,7 +15,10 @@ const UI = {
     bootBtn: document.getElementById('bootBtn'),
     emer: document.getElementById('emergencyMsg'),
     alertTxt: document.getElementById('alertTxt'),
-    clock: document.getElementById('clock')
+    clock: document.getElementById('clock'),
+    // 💡 index.htmlの追加パーツ（QR用）を完全紐付け
+    qrPopup: document.getElementById('qrPopup'),
+    qrImg: document.getElementById('qrImg')
 };
 
 const meta = {
@@ -107,7 +110,7 @@ function update() {
     });
 }
 
-// 放送コントロール（全ボタン対応）
+// 放送コントロール（全ボタン対応・QR一括自動生成強化）
 function playAnn(mode) {
     const route = UI.dirSel.value === 'up' ? [...stations].reverse() : [...stations];
     const type = UI.typeSel.value;
@@ -131,7 +134,52 @@ function playAnn(mode) {
         case 'chime': UI.chime.play(); break;
         case 'wait': speak("この駅で、電車の待ち合わせをいたします。発車までしばらくお待ちください。"); break;
         case 'manner': speak("車内では、携帯電話をマナーモードに設定のうえ、通話はご遠慮ください。ご協力をお願いします。"); break;
-        case 'delay': speak("列車が遅れまして、ご迷惑をおかけしております。"); break;
+        
+        case 'delay': 
+            // 💡 運行指令設定パネルから全項目をリアルタイム抽出し、スマホにそのまま投げる超拡張ロジック
+            const infoStatus = document.getElementById('infoStatusSel')?.value || "delay";
+            const delayMin = document.getElementById('delayMinInput')?.value || "15";
+            const resumeTime = document.getElementById('resumeTimeSel')?.value || "未定";
+            const delayReason = document.getElementById('delayReasonSel')?.value || "急病人救護活動";
+            const delaySection = document.getElementById('delaySectionSel')?.value || "館浜〜赤山町";
+            const customDetail = document.getElementById('customDetailInput')?.value || "";
+
+            let speechTxt = "";
+            let timeParam = delayMin;
+
+            // コントロールパネルの選択状態に合わせて、タブレットが喋るお詫び放送の文章を分岐生成
+            if (infoStatus === "delay") {
+                speechTxt = `列車が遅れましてご迷惑をおかけしております。${delaySection}間は、${delayReason}の影響のため、現在約${delayMin}分遅れております。`;
+                timeParam = delayMin;
+                setTelop(`【運行情報】${delaySection}間は、${delayReason}のため遅れが出ています。`);
+            } else if (infoStatus === "suspend") {
+                speechTxt = `運転見合わせのご案内です。${delaySection}間は、${delayReason}のため、現在運転を見合わせております。運転再開は、${resumeTime}を見込んでおります。`;
+                timeParam = resumeTime;
+                setTelop(`【運行情報】見合わせ：${delaySection}間（${delayReason}）再開見込 ${resumeTime}`);
+            } else if (infoStatus === "plan") {
+                speechTxt = `運転休止のご案内です。${delaySection}間は、${delayReason}のため、運転を休止いたします。最新の情報にご注意ください。`;
+                timeParam = "終日";
+                setTelop(`【計画運休】終日休止：${delaySection}間（${delayReason}）`);
+            }
+
+            // 合成音声でお詫び案内を発生
+            speak(speechTxt);
+
+            // 💡 スマホのdelay.htmlへ全バリエーション状態を通知する暗号URL作成
+            // 本番環境に合わせた絶対パス、またはGitHub Pages等のURL構造を動的に組み立て可能
+            const baseUrl = window.location.href.replace('index.html', 'delay.html').split('?')[0];
+            const targetUrl = `${baseUrl}?status=${infoStatus}&time=${encodeURIComponent(timeParam)}&reason=${encodeURIComponent(delayReason)}&sec=${encodeURIComponent(delaySection)}&detail=${encodeURIComponent(customDetail)}`;
+            
+            // 操作盤の画面中央にQRコードポップアップを表示
+            if(UI.qrPopup && UI.qrImg) {
+                UI.qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(targetUrl)}`;
+                UI.qrPopup.style.display = 'block';
+                
+                // 25秒間表示し、スマホスキャンを終えた頃に自動的にフェードアウトして閉じる
+                setTimeout(() => { UI.qrPopup.style.display = 'none'; }, 25000);
+            }
+            break;
+
         case 'school_greet':
             speak("本日は修学旅行でのご利用、誠にありがとうございます。思い出に残る楽しい旅となりますよう、乗務員一同お手伝いさせていただきます。");
             setTelop("✨ WELCOME ✨ 楽しい修学旅行の思い出を！");
