@@ -12,7 +12,7 @@
     --text-black: #1a1a1a;     /* LCD文字色 */
 }
 
-/* --- ベース設定 --- */
+/* --- ベース設定 --- */　
 * {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
