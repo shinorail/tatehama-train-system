@@ -16,7 +16,7 @@ const UI = {
     emer: document.getElementById('emergencyMsg'),
     alertTxt: document.getElementById('alertTxt'),
     clock: document.getElementById('clock'),
-    // 💡 全画面QRモニター用要素
+    // 💡 全画面QRモニター用要素　
     qrFullMonitor: document.getElementById('qrFullMonitor'),
     qrImg: document.getElementById('qrImg')
 };
