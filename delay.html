@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>館浜電鉄 運行情報</title>
     <style>
-        /* --- 変数定義：スマートフォンに最適化したモダンな配色 --- */
+        /* --- 変数定義 --- */
         :root {
             --th-blue: #0056b3;
             --th-orange: #f39800;
@@ -15,225 +15,103 @@
             --text-main: #222222;
             --text-sub: #666666;
             --border-color: #e0e4ec;
+            --theme-color: var(--th-orange); /* 動的変更用 */
         }
 
-        /* 全体ベース設定（モバイル最優先・タップ硬直防止） */
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-gray);
-            color: var(--text-main);
-            line-height: 1.6;
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+            margin: 0; padding: 0; background-color: var(--bg-gray); color: var(--text-main); line-height: 1.6;
         }
 
-        /* 鉄道会社風ヘッダー */
         header {
-            background-color: var(--th-blue);
-            color: #ffffff;
-            padding: 16px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.15rem;
-            letter-spacing: 1px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            background-color: var(--th-blue); color: #ffffff; padding: 16px; text-align: center;
+            font-weight: bold; font-size: 1.15rem; letter-spacing: 1px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12); position: sticky; top: 0; z-index: 100;
         }
 
-        /* メインコンテナ（スマホ幅に自動調整、PC時は中央寄せ） */
-        .container {
-            padding: 16px;
-            max-width: 540px;
-            margin: 0 auto;
-        }
+        .container { padding: 16px; max-width: 540px; margin: 0 auto; }
 
-        /* 運行情報カード */
         .status-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            border-top: 6px solid var(--th-orange);
-            padding: 20px 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            margin-bottom: 16px;
+            background: var(--card-bg); border-radius: 12px;
+            border-top: 6px solid var(--theme-color); padding: 20px 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 16px;
         }
 
         .status-title {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: var(--th-orange);
-            margin-top: 0;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 1.25rem; font-weight: bold; color: var(--theme-color);
+            margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;
         }
 
         .update-time {
-            font-size: 0.85rem;
-            color: var(--text-sub);
-            margin-bottom: 16px;
-            border-bottom: 1px dashed var(--border-color);
-            padding-bottom: 10px;
-        }
-
-        .status-body {
-            font-size: 0.95rem;
-        }
-
-        .status-body p {
-            margin: 12px 0;
+            font-size: 0.85rem; color: var(--text-sub); margin-bottom: 16px;
+            border-bottom: 1px dashed var(--border-color); padding-bottom: 10px;
         }
 
         .line-name {
-            display: inline-block;
-            background-color: #e6f0fa;
-            color: var(--th-blue);
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 0.9rem;
+            display: inline-block; background-color: #e6f0fa; color: var(--th-blue);
+            padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.9rem;
         }
 
-        .highlight-min {
-            color: var(--th-red);
-            font-size: 1.2rem;
-            font-weight: 900;
-            border-bottom: 2px solid var(--th-red);
-            padding: 0 2px;
+        .badge-danger {
+            background-color: var(--th-red) !important; color: #fff !important;
         }
 
-        /* 遅延証明書発行ボタン */
+        .highlight-txt {
+            color: var(--theme-color); font-size: 1.2rem; font-weight: 900;
+            border-bottom: 2px solid var(--theme-color); padding: 0 2px;
+        }
+
+        /* 証書発行用カスタムボタン */
         .cert-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background-color: #ffffff;
-            border: 2px solid var(--th-blue);
-            color: var(--th-blue);
-            text-align: center;
-            padding: 14px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 1rem;
-            text-decoration: none;
-            margin-top: 24px;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0, 86, 179, 0.1);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            background-color: #ffffff; border: 2px solid var(--theme-color); color: var(--theme-color);
+            text-align: center; padding: 14px; border-radius: 8px; font-weight: bold;
+            font-size: 1rem; text-decoration: none; margin-top: 24px; transition: all 0.2s;
         }
 
-        .cert-btn:not(:disabled):active {
-            background-color: var(--th-blue);
-            color: #ffffff;
-            transform: scale(0.98);
+        .cert-btn:active {
+            background-color: var(--theme-color); color: #ffffff; transform: scale(0.98);
         }
 
-        /* --- モーダル（ポップアップ表示エリア） --- */
+        /* モーダル */
         #certModal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.25s ease;
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px); justify-content: center; align-items: center;
+            padding: 16px; z-index: 1000; opacity: 0; transition: opacity 0.25s ease;
         }
 
-        #certModal.show {
-            display: flex;
-            opacity: 1;
-        }
+        #certModal.show { display: flex; opacity: 1; }
 
-        /* 遅延証明書本体（実物の紙をイメージ） */
         .cert-paper {
-            background: #ffffff;
-            padding: 32px 24px;
-            width: 100%;
-            max-width: 420px;
-            border: 2px dashed #888888;
-            border-radius: 4px;
-            text-align: center;
-            box-sizing: border-box;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            transform: translateY(20px);
-            transition: transform 0.25s ease;
+            background: #ffffff; padding: 32px 24px; width: 100%; max-width: 420px;
+            border: 2px dashed #888888; border-radius: 4px; text-align: center;
+            box-sizing: border-box; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            transform: translateY(20px); transition: transform 0.25s ease;
         }
 
-        #certModal.show .cert-paper {
-            transform: translateY(0);
-        }
+        #certModal.show .cert-paper { transform: translateY(0); }
 
         .cert-paper h2 {
-            margin-top: 0;
-            color: #000000;
-            font-size: 1.4rem;
-            border-bottom: 2px solid #000000;
-            padding-bottom: 12px;
-            letter-spacing: 4px;
+            margin-top: 0; font-size: 1.4rem; border-bottom: 2px solid #000;
+            padding-bottom: 12px; letter-spacing: 2px;
         }
 
-        .company-name {
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin: 16px 0 8px 0;
-            letter-spacing: 2px;
-        }
+        .company-name { font-size: 1.1rem; font-weight: bold; margin: 16px 0 8px 0; }
+        .cert-date { font-size: 0.9rem; color: #444444; margin-bottom: 20px; }
+        .cert-text { text-align: left; font-size: 0.9rem; line-height: 1.8; margin: 20px 0; }
 
-        .cert-date {
-            font-size: 0.9rem;
-            color: #444444;
-            margin-bottom: 20px;
-        }
-
-        .cert-text {
-            text-align: left;
-            font-size: 0.9rem;
-            line-height: 1.8;
-            margin: 20px 0;
-            color: #111111;
-        }
-
-        /* 赤スタンプ風表示 */
         .cert-stamp {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: var(--th-red);
-            border: 3px double var(--th-red);
-            display: inline-block;
-            padding: 6px 20px;
-            margin: 12px 0;
-            transform: rotate(-3deg);
-            border-radius: 4px;
-            font-family: "Hiragino Mincho ProN", "MS Mincho", serif;
+            font-size: 1.2rem; font-weight: bold; color: var(--th-red);
+            border: 3px double var(--th-red); display: inline-block;
+            padding: 6px 15px; margin: 12px 0; transform: rotate(-2deg);
+            border-radius: 4px; font-family: serif;
         }
 
         .close-btn {
-            margin-top: 24px;
-            background: #444444;
-            color: #ffffff;
-            border: none;
-            width: 100%;
-            padding: 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .close-btn:active {
-            background: #222222;
+            margin-top: 24px; background: #444; color: #fff; border: none;
+            width: 100%; padding: 12px; border-radius: 6px; font-weight: bold; font-size: 1rem;
         }
     </style>
 </head>
@@ -243,80 +121,115 @@
 
 <div class="container">
     <div class="status-card">
-        <div class="status-title">⚠️ ダイヤ乱れ（一部遅延）</div>
+        <div class="status-title" id="statusTitle">⚠️ ダイヤ乱れ</div>
         <div class="update-time">更新時間: <span id="liveTime">--:--:--</span></div>
         
-        <div class="status-body">
-            <p><span class="line-name">館浜電鉄線</span></p>
-            <p>
-                本日、一部駅での急病人救護活動および安全確認の影響により、
-                <strong>館浜〜赤山町</strong>の上下線の一部列車に<strong class="highlight-min" id="displayMin">約15分</strong>の遅れが出ております。
-            </p>
-            <p>ご利用のお客様には、ご不便とご迷惑をおかけいたしますことを深くお詫び申し上げます。</p>
-        </div>
+        <div class="status-body" id="statusBody">
+            </div>
 
-        <a href="#" class="cert-btn" onclick="showCertificate(event)">
-            📄 当日の遅延証明書を表示
+        <a href="#" class="cert-btn" id="actionBtn" onclick="showCertificate(event)">
+            📄 証明書読込中...
         </a>
     </div>
 </div>
 
 <div id="certModal" onclick="closeCertificate()">
     <div class="cert-paper" onclick="event.stopPropagation()">
-        <h2>遅延証明書</h2>
+        <h2 id="modalHeader">遅延証明書</h2>
         <div class="company-name">館浜電鉄株式会社</div>
         <div id="certDate" class="cert-date">----年 --月 --日</div>
         
-        <p class="cert-text">
-            本日に限り、当社線において列車が遅延したことを証明いたします。<br>
-            ※本証によって生じた損害の賠償等については、当社はその責を負いません。
+        <p class="cert-text" id="modalText">
+            本日に限り、当社線において列車が遅延したことを証明いたします。
         </p>
         
         <div id="certStamp" class="cert-stamp">
-            最大 15 分遅延
+            証明スタンプ
         </div>
         <br>
-        <button class="close-btn" onclick="closeCertificate()">画面を閉じる</button>
+        <button class="close-btn" onclick="closeCertificate()">閉じる</button>
     </div>
 </div>
 
 <script>
-    // 1. スマートフォン向けの現在時刻・日付の自動反映
+    // 時間と日付のセット
     const now = new Date();
     document.getElementById('liveTime').textContent = now.toLocaleTimeString();
     document.getElementById('certDate').textContent = `${now.getFullYear()}年 ${now.getMonth() + 1}月 ${now.getDate()}日 当日に限り有効`;
 
-    // 2. URLパラメータ（?min=XX）の自動解析と全機能同期
+    // パラメータ解析
     const urlParams = new URLSearchParams(window.location.search);
-    let delayMin = urlParams.get('min');
+    const status = urlParams.get('status') || "delay";
+    const timeInfo = urlParams.get('time') || "15";
+    const reason = urlParams.get('reason') || "急病人救護活動";
+    const section = urlParams.get('sec') || "館浜〜赤山町";
 
-    // パラメータがない、または不正な値の場合はデフォルト「15」
-    if (!delayMin || isNaN(delayMin) || parseInt(delayMin) <= 0) {
-        delayMin = 15;
+    const titleEl = document.getElementById('statusTitle');
+    const bodyEl = document.getElementById('statusBody');
+    const btnEl = document.getElementById('actionBtn');
+    
+    const modalHeader = document.getElementById('modalHeader');
+    const modalText = document.getElementById('modalText');
+    const certStamp = document.getElementById('certStamp');
+
+    // 💡 バリエーション分岐ロジック
+    if (status === "suspend") {
+        // --- 運転見合わせモード ---
+        document.documentElement.style.setProperty('--theme-color', 'var(--th-red)');
+        titleEl.textContent = "❌ 運転見合わせ";
+        bodyEl.innerHTML = `
+            <p><span class="line-name badge-danger">館浜電鉄線</span></p>
+            <p><strong>${section}</strong>の上下線は、<strong>${reason}</strong>のため、現在<span class="highlight-txt">運転を見合わせております。</span></p>
+            <p>運転再開は <strong class="highlight-txt">${timeInfo}</strong> を見込んでおりますが、作業状況により前後する可能性があります。</p>
+        `;
+        btnEl.textContent = "🎫 振替輸送票 (デジタル) を表示";
+        
+        // モーダルの書き換え
+        modalHeader.textContent = "振替輸送票";
+        modalText.innerHTML = `運転見合わせに伴い、他社線および代行バスへの振替輸送を実施しております。<br><br><strong>【対象区間】</strong><br>${section}`;
+        certStamp.textContent = "振替実施中";
+        
+    } else if (status === "plan") {
+        // --- 計画運休モード（台風・災害・長期用） ---
+        document.documentElement.style.setProperty('--theme-color', 'var(--th-red)');
+        titleEl.textContent = "🛑 運転休止（計画運休）";
+        bodyEl.innerHTML = `
+            <p><span class="line-name badge-danger">館浜電鉄線</span></p>
+            <p><strong>${reason}</strong>が予想されるため、お客様の安全を最優先とし、<strong>${section}</strong>間は<span class="highlight-txt">終日運転を休止（運休）</span>いたします。</p>
+            <p>復旧および運転再開スケジュールは、気象・設備の安全確認が取れ次第、順次発表いたします。長期にわたる可能性がありますのでご注意ください。</p>
+        `;
+        btnEl.textContent = "📄 運休証明書を表示";
+        
+        modalHeader.textContent = "運休証明書";
+        modalText.innerHTML = `上記の事象に伴い、対象区間の列車が計画運休（終日休止）したことを証明いたします。`;
+        certStamp.textContent = "計画運休";
+
     } else {
-        delayMin = parseInt(delayMin);
+        // --- 通常の遅延モード ---
+        titleEl.textContent = "⚠️ ダイヤ乱れ（一部遅延）";
+        bodyEl.innerHTML = `
+            <p><span class="line-name">館浜電鉄線</span></p>
+            <p>本日、<strong>${reason}</strong>により、<strong>${section}</strong>の上下線の一部列車に<strong class="highlight-min class="highlight-txt"">約${timeInfo}分</strong>の遅れが出ております。</p>
+        `;
+        btnEl.textContent = "📄 当日の遅延証明書を表示";
+        
+        modalHeader.textContent = "遅延証明書";
+        modalText.textContent = "本日に限り、当社線において列車が遅延したことを証明いたします。";
+        certStamp.textContent = `最大 ${timeInfo} 分遅延`;
     }
 
-    // アプリから引き継いだ分数を画面上のUIに反映
-    document.getElementById('displayMin').textContent = `約${delayMin}分`;
-    document.getElementById('certStamp').textContent = `最大 ${delayMin} 分遅延`;
-
-    // モーダルアニメーション制御（フェードイン・フェードアウト）
+    // アニメーション制御
     function showCertificate(e) {
         e.preventDefault();
         const modal = document.getElementById('certModal');
         modal.style.display = 'flex';
-        setTimeout(() => {
-            modal.classList.add('show');
-        }, 10);
+        setTimeout(() => { modal.classList.add('show'); }, 10);
     }
 
     function closeCertificate() {
         const modal = document.getElementById('certModal');
         modal.classList.remove('show');
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 250); // CSSアニメーションの時間と同期
+        setTimeout(() => { modal.style.display = 'none'; }, 250);
     }
 </script>
 
