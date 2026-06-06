@@ -2,7 +2,7 @@
 :root {
     --bg-dark: #0d0d0d;        /* 全体背景 */
     --panel-bg: #1a1a1a;       /* 操作パネル背景 */
-    --lcd-bg: #ffffff;         /* LCD通常背景 */
+    --lcd-bg: #ffffff;         /* LCD通常背景 */　
     --accent-blue: #0056b3;    /* 館浜ブルー */
     --accent-green: #008f39;   /* 正常・進行カラー */
     --accent-red: #d90000;     /* 非常・警告カラー */
